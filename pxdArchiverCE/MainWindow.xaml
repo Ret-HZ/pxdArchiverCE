@@ -6,6 +6,17 @@
         xmlns:local="clr-namespace:pxdArchiverCE"
         mc:Ignorable="d"
         Title="PXD Archiver Community Edition" Height="650" Width="1200">
+
+    <Window.Resources>
+        <Style x:Key="ImageEnabled" TargetType="Image">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,19 +45,32 @@
             </MenuItem>
         </Menu>
 
+        <ToolBarTray Grid.Row="1">
+            <ToolBar ToolTip="General" Loaded="ToolBar_Loaded">
+                <Button ToolTip="New">
+                    <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
+                </Button>
+                <Button ToolTip="Open" Click="FileOpen_Click">
+                    <Image Source="/Resources/Images/FolderOpen.png" Width="16" Height="16"/>
+                </Button>
+                <Button ToolTip="Save">
+                    <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
+                </Button>
+                <Separator/>
+            </ToolBar>
+            <ToolBar ToolTip="Navigation" Loaded="ToolBar_Loaded">
+                <Button x:Name="btn_Navigation_Previous" ToolTip="Previous" IsEnabled="False" Click="btn_Navigation_Previous_Click">
+                    <Image Source="/Resources/Images/Previous.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button x:Name="btn_Navigation_Next" ToolTip="Next" IsEnabled="False" Click="btn_Navigation_Next_Click">
+                    <Image Source="/Resources/Images/Next.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button x:Name="btn_Navigation_DirectoryUp" ToolTip="Directory Up" IsEnabled="False" Click="btn_Navigation_DirectoryUp_Click">
+                    <Image Source="/Resources/Images/OneLevelUp.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
 
-        <ToolBar Grid.Row="1">
-            <Button ToolTip="New">
-                <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
-            </Button>
-            <Button ToolTip="Open" Click="FileOpen_Click">
-                <Image Source="/Resources/Images/FolderOpen.png" Width="16" Height="16"/>
-            </Button>
-            <Button ToolTip="Save">
-                <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
-            </Button>
-            <Separator/>
-        </ToolBar>
 
 
         <Grid Grid.Row="2">

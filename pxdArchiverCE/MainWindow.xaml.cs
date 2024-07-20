@@ -26,6 +26,21 @@ namespace pxdArchiverCE
         /// </summary>
         Dictionary<string, BitmapImage> FileIconCache = new Dictionary<string, BitmapImage>();
 
+        /// <summary>
+        /// Previously opened nodes.
+        /// </summary>
+        Stack<Node> NavigationHistoryPrevious = new Stack<Node>();
+        
+        /// <summary>
+        /// Previously opened nodes after going back in navigation.
+        /// </summary>
+        Stack<Node> NavigationHistoryNext = new Stack<Node>();
+
+        /// <summary>
+        /// Currently opened node.
+        /// </summary>
+        Node NavigationHistoryCurrent;
+
 
         public MainWindow()
         {
@@ -47,13 +62,41 @@ namespace pxdArchiverCE
 
             PXDArchive = NodeFactory.FromFile(path);
             PXDArchive.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(parameters);
+
+            OpenDirectory(PXDArchive.Children[0]);
+            PopulateTreeView(PXDArchive.Children[0]);
+        }
+
+
+        /// <summary>
+        /// Open a directory and populate the DataGrid with its contents.
+        /// </summary>
+        /// <param name="node">The node container to use as the directory root.</param>
+        /// <param name="isReturn">Is it returning to a previous directory?</param>
+        private void OpenDirectory(Node node, bool isReturn = false)
+        {
+            if (NavigationHistoryCurrent != null)
+            {
+                if (isReturn) //Dont add the directory to the list of nexts if we are returning to it
+                {
+                    NavigationHistoryNext.Push(NavigationHistoryCurrent);
+                }
+                else
+                {
+                    NavigationHistoryPrevious.Push(NavigationHistoryCurrent);
+                }
+            }
+
+            NavigationHistoryCurrent = node;
+            PopulateDataGrid(node);
+            UpdateNavigationToolbar();
         }
 
 
         /// <summary>
         /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
         /// </summary>
-        /// <param name="rootNode"></param>
+        /// <param name="rootNode">The node to act as root of the directory.</param>
         private void PopulateDataGrid(Node rootNode)
         {
             if (rootNode == null) return;
@@ -125,7 +168,15 @@ namespace pxdArchiverCE
         /// </summary>
         private void PopulateTreeView(Node node)
         {
-            ObservableCollection<ParDirectory> parDirectories = BuildParDirectoryList(node);
+            ObservableCollection<ParDirectory> parDirectories = new ObservableCollection<ParDirectory>();
+            ParDirectory rootDirectory = new ParDirectory()
+            {
+                Name = "Directory",
+                Node = node,
+                Children = BuildParDirectoryList(node),
+                IsExpanded = true,
+            };
+            parDirectories.Add(rootDirectory);
             treeview_ParFolders.ItemsSource = parDirectories;
         }
 
@@ -199,6 +250,17 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Update the state of the Navigation Toolbar buttons.
+        /// </summary>
+        private void UpdateNavigationToolbar()
+        {
+            btn_Navigation_DirectoryUp.IsEnabled = (NavigationHistoryCurrent != null && NavigationHistoryCurrent.Parent != null && NavigationHistoryCurrent.Name != ".") ? true : false;
+            btn_Navigation_Previous.IsEnabled = (NavigationHistoryPrevious.Count > 0) ? true : false;
+            btn_Navigation_Next.IsEnabled = (NavigationHistoryNext.Count > 0) ? true : false;
+        }
+
+
+        /// <summary>
         /// Click event for the File Open menu or toolbar items.
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
@@ -218,8 +280,6 @@ namespace pxdArchiverCE
                     // Open file 
                     string filePath = openFileDialog.FileName;
                     OpenPAR(filePath);
-                    PopulateDataGrid(PXDArchive.Children[0]);
-                    PopulateTreeView(PXDArchive.Children[0]);
                 }
                 catch (Exception ex)
                 {
@@ -238,7 +298,7 @@ namespace pxdArchiverCE
             ParEntry parEntry = (ParEntry)cell.DataContext;
             if (parEntry.Node.IsContainer)
             {
-                PopulateDataGrid(parEntry.Node);
+                OpenDirectory(parEntry.Node);
             }
             else
             {
@@ -256,8 +316,57 @@ namespace pxdArchiverCE
             if (treeViewItem.IsSelected)
             {
                 ParDirectory parDirectory = (ParDirectory)treeViewItem.DataContext;
-                PopulateDataGrid(parDirectory.Node);
+                OpenDirectory(parDirectory.Node);
             }
+        }
+
+
+        /// <summary>
+        /// Removes the overflow arrow from a <see cref="ToolBar"/> when inside a <see cref="ToolBarTray"/>.
+        /// </summary>
+        private void ToolBar_Loaded(object sender, RoutedEventArgs e)
+        {
+            ToolBar toolBar = sender as ToolBar;
+            var overflowGrid = toolBar.Template.FindName("OverflowGrid", toolBar) as FrameworkElement;
+            if (overflowGrid != null)
+            {
+                overflowGrid.Visibility = Visibility.Collapsed;
+            }
+
+            var mainPanelBorder = toolBar.Template.FindName("MainPanelBorder", toolBar) as FrameworkElement;
+            if (mainPanelBorder != null)
+            {
+                mainPanelBorder.Margin = new Thickness(0);
+            }
+        }
+
+
+        /// <summary>
+        /// Mouse click event for the Navigation (Previous) button. Will navigate to the previously visited directory.
+        /// </summary>
+        private void btn_Navigation_Previous_Click(object sender, RoutedEventArgs e)
+        {
+            Node previousDirectory = NavigationHistoryPrevious.Pop();
+            OpenDirectory(previousDirectory, true);
+        }
+
+
+        /// <summary>
+        /// Mouse click event for the Navigation (Next) button. Will navigate to the next directory if the Navigation (Previous) button has been used.
+        /// </summary>
+        private void btn_Navigation_Next_Click(object sender, RoutedEventArgs e)
+        {
+            Node nextDirectory = NavigationHistoryNext.Pop();
+            OpenDirectory(nextDirectory);
+        }
+
+
+        /// <summary>
+        /// Mouse click event for the Navigation (Directory Up) button. Will navigate to the directory one level above the current one.
+        /// </summary>
+        private void btn_Navigation_DirectoryUp_Click(object sender, RoutedEventArgs e)
+        {
+            OpenDirectory(NavigationHistoryCurrent.Parent);
         }
     }
 
