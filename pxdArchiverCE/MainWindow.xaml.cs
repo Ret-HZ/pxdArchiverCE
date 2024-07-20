@@ -63,6 +63,10 @@ namespace pxdArchiverCE
             PXDArchive = NodeFactory.FromFile(path);
             PXDArchive.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(parameters);
 
+            NavigationHistoryPrevious.Clear();
+            NavigationHistoryNext.Clear();
+            NavigationHistoryCurrent = null;
+
             OpenDirectory(PXDArchive.Children[0]);
             PopulateTreeView(PXDArchive.Children[0]);
         }
