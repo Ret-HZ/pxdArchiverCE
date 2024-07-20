@@ -79,26 +79,28 @@
                 <ColumnDefinition Width="0.75*"/>
             </Grid.ColumnDefinitions>
 
-            <TreeView Grid.Column="0" x:Name="treeview_ParFolders" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                <TreeView.Resources>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                        <EventSetter Event="MouseLeftButtonUp" Handler="TreeViewItem_MouseLeftButtonUp"/>
-                    </Style>
-                    <HierarchicalDataTemplate DataType="{x:Type local:ParDirectory}" ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image x:Name="treeviewitem_FolderIcon" Source="/Resources/Images/FolderClosed.png" Margin="0,0,5,0"/>
-                            <TextBlock Text="{Binding Name}"/>
-                        </StackPanel>
-                        <HierarchicalDataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                <Setter TargetName="treeviewitem_FolderIcon" Property="Source" Value="/Resources/Images/FolderOpen.png"/>
-                            </DataTrigger>
-                        </HierarchicalDataTemplate.Triggers>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-            </TreeView>
-            
+            <Grid x:Name="grid_ParDirectory" Grid.Column="0" AllowDrop="True" Drop="grid_ParDirectory_Drop">
+                <TreeView x:Name="treeview_ParFolders" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                    <TreeView.Resources>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                            <EventSetter Event="MouseLeftButtonUp" Handler="TreeViewItem_MouseLeftButtonUp"/>
+                        </Style>
+                        <HierarchicalDataTemplate DataType="{x:Type local:ParDirectory}" ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="treeviewitem_FolderIcon" Source="/Resources/Images/FolderClosed.png" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                            <HierarchicalDataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                    <Setter TargetName="treeviewitem_FolderIcon" Property="Source" Value="/Resources/Images/FolderOpen.png"/>
+                                </DataTrigger>
+                            </HierarchicalDataTemplate.Triggers>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </Grid>
+
             <GridSplitter Grid.Column="0" Width="5"/>
             
             <DataGrid Grid.Column="1" x:Name="datagrid_ParContents" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"

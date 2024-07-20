@@ -374,6 +374,19 @@ namespace pxdArchiverCE
         {
             OpenDirectory(NavigationHistoryCurrent.Parent);
         }
+
+
+        /// <summary>
+        /// File drop event for the Directory section of the UI.
+        /// </summary>
+        private void grid_ParDirectory_Drop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0)
+            {
+                OpenPAR(files[0]);
+            }
+        }
     }
 
 
