@@ -116,6 +116,7 @@ namespace pxdArchiverCE
                 string compressedSize;
                 string ratio;
                 DateTime time;
+                string directory;
 
                 //Folders
                 if (node.IsContainer)
@@ -147,6 +148,7 @@ namespace pxdArchiverCE
                 compressedSize = Util.FormatBytes(sizeBytesCompressed);
                 ratio = $"{(sizeBytes > 0 ? (int)((1.0 * sizeBytesCompressed / sizeBytes) * 100) : "---")}%";
 
+                directory = node.Path.Split("/./", 2)[1].Replace(node.Name, "");
 
                 entries.Add(
                     new ParEntry()
@@ -158,7 +160,7 @@ namespace pxdArchiverCE
                         CompressedSize = compressedSize,
                         Ratio = ratio,
                         Time = time,
-                        Directory = node.Path,
+                        Directory = directory,
                         Node = node,
                     });
             }
