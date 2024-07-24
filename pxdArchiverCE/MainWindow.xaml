@@ -38,7 +38,8 @@
                 
             </MenuItem>
             <MenuItem Header="Settings">
-                
+                <MenuItem x:Name="mi_Settings_CopyParToTempLocation" Header="Copy PARC to temp directory" IsCheckable="True" Loaded="mi_Settings_CopyParToTempLocation_Loaded" Click="mi_Settings_CopyParToTempLocation_Click"
+                          ToolTip="Copy the PARC file to a temporary location.&#x0a;This may increase initial load times due to the copy process but will allow overwriting the original file."/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About pxdArchiverCE"/>

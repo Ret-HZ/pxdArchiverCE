@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Collections.ObjectModel;
+using Yarhl.IO;
 
 namespace pxdArchiverCE
 {
@@ -55,20 +56,42 @@ namespace pxdArchiverCE
         /// <param name="path">The path to the PARC file.</param>
         private void OpenPAR(string path)
         {
-            var parameters = new ParArchiveReaderParameters
+            try
             {
-                Recursive = false
-            };
+                var parameters = new ParArchiveReaderParameters
+                {
+                    Recursive = false
+                };
 
-            PXDArchive = NodeFactory.FromFile(path);
-            PXDArchive.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(parameters);
+                if (PXDArchive != null) PXDArchive.Dispose();
 
-            NavigationHistoryPrevious.Clear();
-            NavigationHistoryNext.Clear();
-            NavigationHistoryCurrent = null;
+                string parPath = path;
+                if (Settings.CopyParToTempLocation)
+                {
+                    parPath = $"{Settings.PATH_APPDATA_SESSION}/par.tmp";
+                    File.Delete(parPath);
+                    File.Copy(path, parPath);
+                }
 
-            OpenDirectory(PXDArchive.Children[0]);
-            PopulateTreeView(PXDArchive.Children[0]);
+                DataStream ds = DataStreamFactory.FromFile(parPath, FileOpenMode.Read);
+                BinaryFormat bf = new BinaryFormat(ds);
+                PXDArchive = new Node(Path.GetFileName(path), bf)
+                {
+                    Tags = { ["FileInfo"] = new FileInfo(path) },
+                };
+                PXDArchive.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(parameters);
+
+                NavigationHistoryPrevious.Clear();
+                NavigationHistoryNext.Clear();
+                NavigationHistoryCurrent = null;
+
+                OpenDirectory(PXDArchive.Children[0]);
+                PopulateTreeView(PXDArchive.Children[0]);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error has occurred when opening the file.\nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -291,16 +314,9 @@ namespace pxdArchiverCE
             Nullable<bool> result = openFileDialog.ShowDialog();
             if (result == true)
             {
-                try
-                {
-                    // Open file 
-                    string filePath = openFileDialog.FileName;
-                    OpenPAR(filePath);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An error has occurred when opening the file.\nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                // Open file 
+                string filePath = openFileDialog.FileName;
+                OpenPAR(filePath);
             }
         }
 
@@ -396,6 +412,26 @@ namespace pxdArchiverCE
             {
                 OpenPAR(files[0]);
             }
+        }
+
+
+        /// <summary>
+        /// Load event for the Settings (CopyParToTempLocation) MenuItem. Will set the IsChecked property accordingly.
+        /// </summary>
+        private void mi_Settings_CopyParToTempLocation_Loaded(object sender, RoutedEventArgs e)
+        {
+            mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (CopyParToTempLocation) MenuItem. Will toggle the CopyParToTempLocation setting.
+        /// </summary>
+        private void mi_Settings_CopyParToTempLocation_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.CopyParToTempLocation = !Settings.CopyParToTempLocation;
+            mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
+            Settings.SaveSettings();
         }
     }
 
