@@ -44,8 +44,8 @@ namespace pxdArchiverCE
 
         public MainWindow()
         {
-            InitializeComponent();
             Settings.Init();
+            InitializeComponent();
         }
 
 
@@ -245,7 +245,7 @@ namespace pxdArchiverCE
             }
             else
             {
-                string tempFilePath = Path.Combine(Settings.PATH_TEMP_ICONS, $"{extension}");
+                string tempFilePath = Path.Combine(Settings.PATH_APPDATA_ICONS, $"{extension}");
                 File.Create(tempFilePath).Dispose();
                 Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(tempFilePath);
                 BitmapImage bmp = icon.ToBitmap().ToBitmapImage();
@@ -263,6 +263,16 @@ namespace pxdArchiverCE
             btn_Navigation_DirectoryUp.IsEnabled = (NavigationHistoryCurrent != null && NavigationHistoryCurrent.Parent != null && NavigationHistoryCurrent.Name != ".") ? true : false;
             btn_Navigation_Previous.IsEnabled = (NavigationHistoryPrevious.Count > 0) ? true : false;
             btn_Navigation_Next.IsEnabled = (NavigationHistoryNext.Count > 0) ? true : false;
+        }
+
+
+        /// <summary>
+        /// Window (app) closing event. Will clean up any temp files.
+        /// </summary>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (PXDArchive != null) PXDArchive.Dispose();
+            Settings.Cleanup();
         }
 
 

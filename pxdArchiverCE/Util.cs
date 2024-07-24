@@ -1,9 +1,21 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 
 namespace pxdArchiverCE
 {
     internal static class Util
     {
+        public static Stream GetEmbeddedFile(string name)
+        {
+            System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
+            string resourceName = asm.GetManifestResourceNames().SingleOrDefault(str => str.EndsWith(name));
+            if (resourceName == null) return null;
+            Stream resFilestream = asm.GetManifestResourceStream(resourceName);
+            if (resFilestream == null) return null;
+            else return resFilestream;
+        }
+
+
         public static string FormatBytes(long bytes)
         {
             string[] Suffix = { "B", "KB", "MB", "GB", "TB" };

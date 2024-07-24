@@ -17,9 +17,11 @@
     <None Remove="Resources\Images\OneLevelUp.png" />
     <None Remove="Resources\Images\Previous.png" />
     <None Remove="Resources\Images\Save.png" />
+    <None Remove="Resources\SettingsTemplate.ini" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
   </ItemGroup>
 
@@ -35,6 +37,7 @@
     <Resource Include="Resources\Images\OneLevelUp.png" />
     <Resource Include="Resources\Images\Previous.png" />
     <Resource Include="Resources\Images\Save.png" />
+    <EmbeddedResource Include="Resources\SettingsTemplate.ini" />
   </ItemGroup>
 
 </Project>

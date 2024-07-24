@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:pxdArchiverCE"
         mc:Ignorable="d"
-        Title="PXD Archiver Community Edition" Height="650" Width="1200">
+        Title="PXD Archiver Community Edition" Height="650" Width="1200" Closing="Window_Closing">
 
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">

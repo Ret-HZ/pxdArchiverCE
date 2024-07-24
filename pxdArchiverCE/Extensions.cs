@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
+using Yarhl.IO;
 
 namespace pxdArchiverCE
 {
@@ -29,6 +30,30 @@ namespace pxdArchiverCE
 
                 return bitmapImage;
             }
+        }
+
+
+        /// <summary>
+        /// Returns the contents of the <see cref="DataStream"/> as a byte array.
+        /// </summary>
+        internal static byte[] ToArray(this DataStream ds)
+        {
+            ds.Seek(0);
+            byte[] array = new byte[ds.Length];
+            ds.Read(array, 0, (int)ds.Length);
+            return array;
+        }
+
+
+        /// <summary>
+        /// Returns the contents of the <see cref="Stream"/> as a byte array.
+        /// </summary>
+        internal static byte[] ToArray(this Stream s)
+        {
+            s.Seek(0, SeekOrigin.Begin);
+            byte[] array = new byte[s.Length];
+            s.Read(array, 0, (int)s.Length);
+            return array;
         }
 
 
