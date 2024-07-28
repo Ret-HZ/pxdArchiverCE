@@ -28,8 +28,8 @@
             <MenuItem Header="File">
                 <MenuItem Header="New"/>
                 <MenuItem Header="Open" Click="FileOpen_Click"/>
-                <MenuItem Header="Save"/>
-                <MenuItem Header="Save as..."/>
+                <MenuItem Header="Save" Click="FileSave_Click"/>
+                <MenuItem Header="Save as..." Click="FileSaveAs_Click"/>
             </MenuItem>
             <MenuItem Header="Edit">
                 
@@ -54,7 +54,7 @@
                 <Button ToolTip="Open" Click="FileOpen_Click">
                     <Image Source="/Resources/Images/FolderOpen.png" Width="16" Height="16"/>
                 </Button>
-                <Button ToolTip="Save">
+                <Button ToolTip="Save" Click="FileSave_Click">
                     <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
                 </Button>
                 <Separator/>

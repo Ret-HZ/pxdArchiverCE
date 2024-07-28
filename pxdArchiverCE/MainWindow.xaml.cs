@@ -103,6 +103,31 @@ namespace pxdArchiverCE
                 NavigationHistoryCurrent = null;
             }
         }
+
+
+        /// <summary>
+        /// Writes the currently opened PARC archive to a file.
+        /// </summary>
+        /// <param name="path">The path for the new PARC file.</param>
+        private void SavePAR(string path)
+        {
+            try
+            {
+                var writerParameters = new ParArchiveWriterParameters
+                {
+                    CompressorVersion = 0x1,
+                    OutputPath = path,
+                };
+
+                // Deep clone the node and write the clone so the file handle remains the same.
+                Node temp = new Node(PXDArchive);
+                File.Delete(path);
+                temp.TransformWith(new ParArchiveWriter(writerParameters));
+                temp.Dispose();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error has occurred when saving the file.\nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -324,6 +349,66 @@ namespace pxdArchiverCE
                 // Open file 
                 string filePath = openFileDialog.FileName;
                 OpenPAR(filePath);
+            }
+        }
+
+
+        /// <summary>
+        /// Click event for the File Save menu or toolbar items.
+        /// </summary>
+        private void FileSave_Click(object sender, RoutedEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            FileInfo fileInfo = (FileInfo)PXDArchive.Tags["FileInfo"];
+            string outPath = fileInfo.FullName;
+
+            if (!Settings.CopyParToTempLocation)
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "PXD Archive (*.par)|*.par|" + "All types (*.*)|*.*";
+                saveFileDialog.FileName = Path.GetFileName(outPath);
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    outPath = saveFileDialog.FileName;
+                    
+                    // Cancel if attempting to save over the same file that is currently open.
+                    if (outPath == fileInfo.FullName)
+                    {
+                        MessageBox.Show("This PARC has not been opened from a temporary location.\nIt is not possible to overwrite the original file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                else return;
+            }
+
+            SavePAR(outPath);
+        }
+
+
+        /// <summary>
+        /// Click event for the File Save As... menu or toolbar items.
+        /// </summary>
+        private void FileSaveAs_Click(object sender, RoutedEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            FileInfo fileInfo = (FileInfo)PXDArchive.Tags["FileInfo"];
+            string outPath = fileInfo.FullName;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "PXD Archive (*.par)|*.par|" + "All types (*.*)|*.*";
+            saveFileDialog.FileName = Path.GetFileName(outPath);
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                outPath = saveFileDialog.FileName;
+
+                // Cancel if attempting to save over the same file that is currently open.
+                if (outPath == fileInfo.FullName && !Settings.CopyParToTempLocation)
+                {
+                    MessageBox.Show("This PARC has not been opened from a temporary location.\nIt is not possible to overwrite the original file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                SavePAR(outPath);
             }
         }
 
