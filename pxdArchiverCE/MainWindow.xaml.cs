@@ -58,14 +58,15 @@ namespace pxdArchiverCE
         {
             try
             {
+                if (PXDArchive != null) PXDArchive.Dispose();
+
                 var parameters = new ParArchiveReaderParameters
                 {
                     Recursive = false
                 };
 
-                if (PXDArchive != null) PXDArchive.Dispose();
-
                 string parPath = path;
+
                 if (Settings.CopyParToTempLocation)
                 {
                     parPath = $"{Settings.PATH_APPDATA_SESSION}/par.tmp";
@@ -73,13 +74,8 @@ namespace pxdArchiverCE
                     File.Copy(path, parPath);
                 }
 
-                DataStream ds = DataStreamFactory.FromFile(parPath, FileOpenMode.Read);
-                BinaryFormat bf = new BinaryFormat(ds);
-                PXDArchive = new Node(Path.GetFileName(path), bf)
-                {
-                    Tags = { ["FileInfo"] = new FileInfo(path) },
-                };
-                PXDArchive.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(parameters);
+                PXDArchive = NodeFactory.FromFile(parPath, FileOpenMode.Read);
+                PXDArchive.TransformWith(new ParArchiveReader(parameters));
 
                 NavigationHistoryPrevious.Clear();
                 NavigationHistoryNext.Clear();
