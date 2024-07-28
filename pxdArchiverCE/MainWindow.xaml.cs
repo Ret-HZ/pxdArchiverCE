@@ -58,7 +58,11 @@ namespace pxdArchiverCE
         {
             try
             {
-                if (PXDArchive != null) PXDArchive.Dispose();
+                if (PXDArchive != null)
+                {
+                    PXDArchive.Dispose();
+                    PXDArchive = null;
+                }
 
                 var parameters = new ParArchiveReaderParameters
                 {
@@ -87,6 +91,18 @@ namespace pxdArchiverCE
             catch (Exception ex)
             {
                 MessageBox.Show($"An error has occurred when opening the file.\nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (PXDArchive != null)
+                {
+                    PXDArchive.Dispose();
+                    PXDArchive = null;
+                }
+                datagrid_ParContents.ItemsSource = null;
+                treeview_ParFolders.ItemsSource = null;
+                NavigationHistoryPrevious.Clear();
+                NavigationHistoryNext.Clear();
+                NavigationHistoryCurrent = null;
+            }
+        }
             }
         }
 
@@ -300,11 +316,6 @@ namespace pxdArchiverCE
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (PXDArchive != null)
-            {
-                PXDArchive.Dispose();
-            }
-
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "PXD Archive (*.par)|*.par|" + "All types (*.*)|*.*";
             Nullable<bool> result = openFileDialog.ShowDialog();
