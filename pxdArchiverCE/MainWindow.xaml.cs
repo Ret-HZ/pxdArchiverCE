@@ -85,8 +85,8 @@ namespace pxdArchiverCE
                 NavigationHistoryNext.Clear();
                 NavigationHistoryCurrent = null;
 
-                OpenDirectory(PXDArchive.Children[0]);
-                PopulateTreeView(PXDArchive.Children[0]);
+                OpenDirectory(PXDArchive);
+                PopulateTreeView(PXDArchive);
             }
             catch (Exception ex)
             {
@@ -140,6 +140,12 @@ namespace pxdArchiverCE
         /// <param name="isReturn">Is it returning to a previous directory?</param>
         private void OpenDirectory(Node node, bool isReturn = false)
         {
+            if (node.Children.Count == 1 && node.Children[0].Name == ".")
+            {
+                OpenDirectory(node.Children[0], isReturn);
+                return;
+            }
+
             if (NavigationHistoryCurrent != null)
             {
                 if (isReturn) //Dont add the directory to the list of nexts if we are returning to it
@@ -166,6 +172,8 @@ namespace pxdArchiverCE
         {
             if (rootNode == null) return;
 
+            string directory = Util.GetNodeDirectory(rootNode);
+
             List<ParEntry> entries = new List<ParEntry>();
             foreach (Node node in rootNode.Children)
             {
@@ -177,7 +185,6 @@ namespace pxdArchiverCE
                 string compressedSize;
                 string ratio;
                 DateTime time;
-                string directory;
 
                 //Folders
                 if (node.IsContainer)
@@ -209,8 +216,6 @@ namespace pxdArchiverCE
                 compressedSize = Util.FormatBytes(sizeBytesCompressed);
                 ratio = $"{(sizeBytes > 0 ? (int)((1.0 * sizeBytesCompressed / sizeBytes) * 100) : "---")}%";
 
-                directory = node.Path.Split("/./", 2)[1].Replace(node.Name, "");
-
                 entries.Add(
                     new ParEntry()
                     {
@@ -235,6 +240,12 @@ namespace pxdArchiverCE
         /// </summary>
         private void PopulateTreeView(Node node)
         {
+            if (node.Children.Count == 1 && node.Children[0].Name == ".")
+            {
+                PopulateTreeView(node.Children[0]);
+                return;
+            }
+
             ObservableCollection<ParDirectory> parDirectories = new ObservableCollection<ParDirectory>();
             ParDirectory rootDirectory = new ParDirectory()
             {
@@ -255,6 +266,13 @@ namespace pxdArchiverCE
         private ObservableCollection<ParDirectory> BuildParDirectoryList(Node node)
         {
             ObservableCollection<ParDirectory> childrenDirectories = new ObservableCollection<ParDirectory>();
+
+            if (node.Children.Count == 1 && node.Children[0].Name == ".")
+            {
+                childrenDirectories = BuildParDirectoryList(node.Children[0]);
+                return childrenDirectories;
+            }
+
             foreach (Node child in node.Children)
             {
                 if (!child.IsContainer) continue;
