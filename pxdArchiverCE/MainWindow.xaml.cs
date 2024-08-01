@@ -23,6 +23,11 @@ namespace pxdArchiverCE
         Node PXDArchive;
 
         /// <summary>
+        /// Path to the currently opened PARC file.
+        /// </summary>
+        string PXDArchivePath = string.Empty;
+
+        /// <summary>
         /// Cache for associated extension icons.
         /// </summary>
         Dictionary<string, BitmapImage> FileIconCache = new Dictionary<string, BitmapImage>();
@@ -76,6 +81,7 @@ namespace pxdArchiverCE
                     parPath = $"{Settings.PATH_APPDATA_SESSION}/par.tmp";
                     File.Delete(parPath);
                     File.Copy(path, parPath);
+                    PXDArchivePath = path;
                 }
 
                 PXDArchive = NodeFactory.FromFile(parPath, FileOpenMode.Read);
@@ -96,6 +102,7 @@ namespace pxdArchiverCE
                     PXDArchive.Dispose();
                     PXDArchive = null;
                 }
+                PXDArchivePath = string.Empty;
                 datagrid_ParContents.ItemsSource = null;
                 treeview_ParFolders.ItemsSource = null;
                 NavigationHistoryPrevious.Clear();
@@ -378,8 +385,7 @@ namespace pxdArchiverCE
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
             if (PXDArchive == null) return;
-            FileInfo fileInfo = (FileInfo)PXDArchive.Tags["FileInfo"];
-            string outPath = fileInfo.FullName;
+            string outPath = PXDArchivePath;
 
             if (!Settings.CopyParToTempLocation)
             {
@@ -391,7 +397,7 @@ namespace pxdArchiverCE
                     outPath = saveFileDialog.FileName;
                     
                     // Cancel if attempting to save over the same file that is currently open.
-                    if (outPath == fileInfo.FullName)
+                    if (outPath == PXDArchivePath)
                     {
                         MessageBox.Show("This PARC has not been opened from a temporary location.\nIt is not possible to overwrite the original file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
