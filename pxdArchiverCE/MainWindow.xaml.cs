@@ -117,6 +117,7 @@ namespace pxdArchiverCE
                 {
                     CompressorVersion = 0x1,
                     OutputPath = path,
+                    IncludeDots = !Settings.LegacyMode,
                 };
 
                 // Deep clone the node and write the clone so the file handle remains the same.
@@ -508,11 +509,12 @@ namespace pxdArchiverCE
 
 
         /// <summary>
-        /// Load event for the Settings (CopyParToTempLocation) MenuItem. Will set the IsChecked property accordingly.
+        /// Load event for the Settings MenuItems. Will set the IsChecked property accordingly.
         /// </summary>
-        private void mi_Settings_CopyParToTempLocation_Loaded(object sender, RoutedEventArgs e)
+        private void mi_Settings_Loaded(object sender, RoutedEventArgs e)
         {
             mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
+            mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
         }
 
 
@@ -523,6 +525,17 @@ namespace pxdArchiverCE
         {
             Settings.CopyParToTempLocation = !Settings.CopyParToTempLocation;
             mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
+            Settings.SaveSettings();
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (LegacyMode) MenuItem. Will toggle the LegacyMode setting.
+        /// </summary>
+        private void mi_Settings_LegacyMode_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.LegacyMode = !Settings.LegacyMode;
+            mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
             Settings.SaveSettings();
         }
     }

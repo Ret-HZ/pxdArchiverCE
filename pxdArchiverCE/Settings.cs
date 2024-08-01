@@ -17,6 +17,7 @@ namespace pxdArchiverCE
         // SETTINGS
         internal static int IniVersion = 1;
         internal static bool CopyParToTempLocation = true;
+        internal static bool LegacyMode = false;
 
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace pxdArchiverCE
 
             IniVersion = int.Parse(settings["GENERAL"]["IniVersion"]);
             CopyParToTempLocation = bool.Parse(settings["PARC"]["CopyParToTempLocation"]);
+            LegacyMode = bool.Parse(settings["PARC"]["LegacyMode"]);
         }
 
 
@@ -60,6 +62,7 @@ namespace pxdArchiverCE
             FileIniDataParser iniParser = new FileIniDataParser();
             IniData settings = iniParser.ReadFile(PATH_APPDATA_SETTINGS);
             settings["PARC"]["CopyParToTempLocation"] = CopyParToTempLocation.ToString().ToLower();
+            settings["PARC"]["LegacyMode"] = LegacyMode.ToString().ToLower();
             iniParser.WriteFile(PATH_APPDATA_SETTINGS, settings);
         }
     }

@@ -38,8 +38,10 @@
                 
             </MenuItem>
             <MenuItem Header="Settings">
-                <MenuItem x:Name="mi_Settings_CopyParToTempLocation" Header="Copy PARC to temp directory" IsCheckable="True" Loaded="mi_Settings_CopyParToTempLocation_Loaded" Click="mi_Settings_CopyParToTempLocation_Click"
+                <MenuItem x:Name="mi_Settings_CopyParToTempLocation" Header="Copy PARC to temp directory" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_CopyParToTempLocation_Click"
                           ToolTip="Copy the PARC file to a temporary location.&#x0a;This may increase initial load times due to the copy process but will allow overwriting the original file."/>
+                <MenuItem x:Name="mi_Settings_LegacyMode" Header="Legacy Mode" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_LegacyMode_Click"
+                          ToolTip="Format PARC file directories to be compatible with older versions of the PXD Engine."/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About pxdArchiverCE"/>
