@@ -7,9 +7,20 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_1024.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_128.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_16.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_2048.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_256.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_32.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_4096.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_512.png" />
+    <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_64.png" />
     <None Remove="Resources\Images\File.png" />
     <None Remove="Resources\Images\FolderClosed.png" />
     <None Remove="Resources\Images\FolderOpen.png" />
@@ -18,6 +29,10 @@
     <None Remove="Resources\Images\Previous.png" />
     <None Remove="Resources\Images\Save.png" />
     <None Remove="Resources\SettingsTemplate.ini" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +45,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_1024.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_128.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_16.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_2048.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_256.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_32.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_4096.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_512.png" />
+    <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_64.png" />
     <Resource Include="Resources\Images\File.png" />
     <Resource Include="Resources\Images\FolderClosed.png" />
     <Resource Include="Resources\Images\FolderOpen.png" />
