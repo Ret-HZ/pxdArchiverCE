@@ -10,6 +10,7 @@ namespace pxdArchiverCE
         internal static string PATH_APPDATA = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pxdArchiverCE");
         internal static Guid SESSION_GUID = Guid.NewGuid();
         internal static string PATH_APPDATA_SESSION = Path.Combine(PATH_APPDATA, "Sessions", SESSION_GUID.ToString());
+        internal static string PATH_APPDATA_SESSION_CONTENTS = Path.Combine(PATH_APPDATA_SESSION, "Contents");
         internal static string PATH_APPDATA_ICONS = Path.Combine(PATH_APPDATA, "Icons");
         internal static string PATH_APPDATA_SETTINGS = Path.Combine(PATH_APPDATA, "Settings.ini");
 
@@ -27,6 +28,7 @@ namespace pxdArchiverCE
         {
             Directory.CreateDirectory(PATH_APPDATA);
             Directory.CreateDirectory(PATH_APPDATA_SESSION);
+            Directory.CreateDirectory(PATH_APPDATA_SESSION_CONTENTS);
             Directory.CreateDirectory(PATH_APPDATA_ICONS);
 
 

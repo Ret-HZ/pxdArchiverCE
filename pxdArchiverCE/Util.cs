@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Yarhl.FileSystem;
 
@@ -35,6 +36,55 @@ namespace pxdArchiverCE
             }
 
             return directory;
+        }
+
+
+        /// <summary>
+        /// Check if a file is currently in use by another process.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>A <see cref="bool"/> indicating if the file is currently locked.</returns>
+        public static bool IsFileLocked(FileInfo file)
+        {
+            try
+            {
+                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Check if a file is currently in use by another process.
+        /// </summary>
+        /// <param name="filePath">The path to the file.</param>
+        /// <returns>A <see cref="bool"/> indicating if the file is currently locked.</returns>
+        public static bool IsFileLocked(string filePath)
+        {
+            FileInfo fileInfo = new FileInfo(filePath);
+            return IsFileLocked(fileInfo);
+        }
+
+
+        /// <summary>
+        /// Summon an <b>explorer.exe</b> process with the file path as parameter, attempting to open it with its default program.
+        /// </summary>
+        /// <param name="path">The file to open.</param>
+        public static void OpenFileWithDefaultProgram(string path)
+        {
+            using Process fileOpener = new Process();
+
+            fileOpener.StartInfo.FileName = "explorer";
+            fileOpener.StartInfo.Arguments = $"\"{path}\"";
+            fileOpener.Start();
         }
 
 

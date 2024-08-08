@@ -172,6 +172,71 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Extract a <see cref="Node"/> to a file in the session directory and attempt to open it with its default program.
+        /// </summary>
+        /// <param name="node">The node to open.</param>
+        /// <param name="directory">The directory (inside the PARC) that file is in.</param>
+        private void OpenFile(Node node, string directory)
+        {
+            string outPath = Path.Combine(Settings.PATH_APPDATA_SESSION_CONTENTS, directory, node.Name);
+            if (ExtractFile(node, outPath))
+            {
+                Util.OpenFileWithDefaultProgram(outPath);
+            }
+        }
+
+
+        /// <summary>
+        /// Write a <see cref="Node"/> to a file.
+        /// </summary>
+        /// <param name="node">The node to write.</param>
+        /// <param name="outputPath">The path to write to.</param>
+        /// <returns>A <see cref="bool"/> indicating if the operation was successful.</returns>
+        private bool ExtractFile(Node node, string outputPath)
+        {
+            if (node.IsContainer) return false;
+
+            if (File.Exists(outputPath))
+            {
+                if (Util.IsFileLocked(outputPath))
+                {
+                    MessageBox.Show($"The file \"{node.Name}\" is currently in use by another process.", "File in use", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                else
+                {
+                    File.Delete(outputPath);
+                }
+            }
+
+            var originalParFile = node.GetFormatAs<ParFile>();
+
+            //Yarhl's deep clone does not properly clone formats and attributes so they need to be set manually
+            Node nodeTemp = new Node(node).TransformWith(new ParFile());
+            var parFile = nodeTemp.GetFormatAs<ParFile>();
+            parFile.CanBeCompressed = originalParFile.CanBeCompressed;
+            parFile.IsCompressed = originalParFile.IsCompressed;
+            parFile.DecompressedSize = originalParFile.DecompressedSize;
+            parFile.Attributes = originalParFile.Attributes;
+            parFile.FileDate = originalParFile.FileDate;
+
+            if (parFile.IsCompressed)
+            {
+                nodeTemp.TransformWith<ParLibrary.Sllz.Decompressor>();
+            }
+
+            nodeTemp.Stream.WriteTo(outputPath);
+            File.SetCreationTime(outputPath, parFile.FileDate);
+            File.SetLastWriteTime(outputPath, parFile.FileDate);
+            File.SetAttributes(outputPath, (FileAttributes)parFile.Attributes);
+            parFile.Dispose();
+            nodeTemp.Dispose();
+
+            return true;
+        }
+
+
+        /// <summary>
         /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
         /// </summary>
         /// <param name="rootNode">The node to act as root of the directory.</param>
@@ -451,7 +516,7 @@ namespace pxdArchiverCE
             }
             else
             {
-                //TODO handle files
+                OpenFile(parEntry.Node, parEntry.Directory);
             }
         }
 
