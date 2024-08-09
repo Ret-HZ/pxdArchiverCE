@@ -126,6 +126,10 @@
                         <Setter Property="IsHitTestVisible" Value="False"/>
                         <Setter Property="Margin" Value="0"/>
                     </Style>
+                    <ContextMenu  x:Key="SelectableColumnContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Open" Header="Open" FontWeight="Bold" Click="datagrid_ParContents_ContextMenu_mi_Open_Click"/>
+                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Extract" Header="Extract" Click="datagrid_ParContents_ContextMenu_mi_Extract_Click"/>
+                    </ContextMenu>
                     <Style x:Key="Selectable" TargetType="{x:Type DataGridCell}">
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -133,6 +137,7 @@
                         <Setter Property="IsTabStop" Value="True"/>
                         <Setter Property="IsHitTestVisible" Value="True"/>
                         <Setter Property="Margin" Value="10,2,30,2"/>
+                        <Setter Property="ContextMenu" Value="{StaticResource SelectableColumnContextMenu}"/>
                         <EventSetter Event="MouseDoubleClick" Handler="DataGridCell_MouseDoubleClick"/>
                     </Style>
                 </DataGrid.Resources>

@@ -238,6 +238,27 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Write the contents of a directory <see cref="Node"/> to the specified path.
+        /// </summary>
+        /// <param name="node">The node to extract.</param>
+        /// <param name="outputPath">The directory to extract the contents to.</param>
+        private void ExtractDirectory(Node node, string outputPath)
+        {
+            foreach (Node child in node.Children)
+            {
+                if (child.IsContainer)
+                {
+                    ExtractDirectory(child, Path.Combine(outputPath, child.Name));
+                }
+                else
+                {
+                    ExtractFile(child, Path.Combine(outputPath, child.Name));
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
         /// </summary>
         /// <param name="rootNode">The node to act as root of the directory.</param>
@@ -415,6 +436,21 @@ namespace pxdArchiverCE
             btn_Navigation_DirectoryUp.IsEnabled = (NavigationHistoryCurrent != null && NavigationHistoryCurrent.Parent != null && NavigationHistoryCurrent.Name != ".") ? true : false;
             btn_Navigation_Previous.IsEnabled = (NavigationHistoryPrevious.Count > 0) ? true : false;
             btn_Navigation_Next.IsEnabled = (NavigationHistoryNext.Count > 0) ? true : false;
+        }
+
+
+        /// <summary>
+        /// Gets a list of selected ParEntries from the DataGrid.
+        /// </summary>
+        /// <returns>A <see cref="ParEntry"/> list.</returns>
+        private List<ParEntry> GetSelectedParEntries()
+        {
+            List<ParEntry> parEntries = new List<ParEntry>();
+            foreach (DataGridCellInfo cellInfo in datagrid_ParContents.SelectedCells)
+            {
+                if (!parEntries.Contains(cellInfo.Item)) parEntries.Add((ParEntry)cellInfo.Item);
+            }
+            return parEntries;
         }
 
 
@@ -626,6 +662,79 @@ namespace pxdArchiverCE
             Settings.LegacyMode = !Settings.LegacyMode;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
             Settings.SaveSettings();
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Open). Will open the selected directory or file.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Open_Click(object sender, RoutedEventArgs e)
+        {
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            if (parEntries.Count == 0) return;
+
+            // Only process the last selection
+            ParEntry selection = parEntries.Last();
+            if (selection.Node.IsContainer)
+            {
+                OpenDirectory(selection.Node);
+            }
+            else
+            {
+                OpenFile(selection.Node, selection.Directory);
+            }
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Extract). Will extract the selected directory or file.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Extract_Click(object sender, RoutedEventArgs e)
+        {
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            if (parEntries.Count == 0) return;
+
+            // Single file extraction
+            if (parEntries.Count == 1 && !parEntries.Last().Node.IsContainer)
+            {
+                Node node = parEntries.Last().Node;
+                string nodeExtension = Path.GetExtension(node.Name);
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Filter = $"{nodeExtension.ToUpper().Substring(1)} File (*{nodeExtension})|*{nodeExtension}|" + "All types (*.*)|*.*",
+                    FileName = node.Name,
+                    
+                };
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    ExtractFile(node, saveFileDialog.FileName);
+                }
+                else return;
+            }
+            // Multiple files or directories
+            else
+            {
+                var openFolderDialog = new OpenFolderDialog
+                {
+                    Title = "Choose where to extract the content",
+                };
+
+                if (openFolderDialog.ShowDialog() == true)
+                {
+                    foreach (ParEntry parEntry in parEntries)
+                    {
+                        if (parEntry.Node.IsContainer)
+                        {
+                            ExtractDirectory(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                        }
+                        else
+                        {
+                            ExtractFile(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                        }
+                    }
+                }
+            }
         }
     }
 
