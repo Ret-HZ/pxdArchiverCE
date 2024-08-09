@@ -81,8 +81,9 @@ namespace pxdArchiverCE
                     parPath = $"{Settings.PATH_APPDATA_SESSION}/par.tmp";
                     File.Delete(parPath);
                     File.Copy(path, parPath);
-                    PXDArchivePath = path;
                 }
+
+                PXDArchivePath = path;
 
                 PXDArchive = NodeFactory.FromFile(parPath, FileOpenMode.Read);
                 PXDArchive.TransformWith(new ParArchiveReader(parameters));
@@ -481,8 +482,7 @@ namespace pxdArchiverCE
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
             if (PXDArchive == null) return;
-            FileInfo fileInfo = (FileInfo)PXDArchive.Tags["FileInfo"];
-            string outPath = fileInfo.FullName;
+            string outPath = PXDArchivePath;
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "PXD Archive (*.par)|*.par|" + "All types (*.*)|*.*";
@@ -492,7 +492,7 @@ namespace pxdArchiverCE
                 outPath = saveFileDialog.FileName;
 
                 // Cancel if attempting to save over the same file that is currently open.
-                if (outPath == fileInfo.FullName && !Settings.CopyParToTempLocation)
+                if (outPath == PXDArchivePath && !Settings.CopyParToTempLocation)
                 {
                     MessageBox.Show("This PARC has not been opened from a temporary location.\nIt is not possible to overwrite the original file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
