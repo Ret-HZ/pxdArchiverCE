@@ -155,7 +155,7 @@
                     <DataGridTextColumn Header="Size" Binding="{Binding Size}" CanUserSort="False"/>
                     <DataGridTextColumn Header="Compressed Size" Binding="{Binding CompressedSize}" CanUserSort="False"/>
                     <DataGridTextColumn Header="Ratio" Binding="{Binding Ratio}" CanUserSort="False"/>
-                    <DataGridTextColumn Header="Time" Binding="{Binding Time}"/>
+                    <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}"/>
                     <DataGridTextColumn Header="Directory" Binding="{Binding Directory}" CanUserSort="False"/>
                 </DataGrid.Columns>
             </DataGrid>
