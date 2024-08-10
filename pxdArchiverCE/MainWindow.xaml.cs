@@ -201,7 +201,7 @@ namespace pxdArchiverCE
             {
                 if (Util.IsFileLocked(outputPath))
                 {
-                    MessageBox.Show($"The file \"{node.Name}\" is currently in use by another process.", "File in use", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"The file \"{Path.GetFileName(outputPath)}\" is currently in use by another process.", "File in use", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return false;
                 }
                 else
