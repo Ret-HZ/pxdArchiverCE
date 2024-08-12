@@ -129,6 +129,11 @@
                     <ContextMenu  x:Key="SelectableColumnContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                         <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Open" Header="Open" FontWeight="Bold" Click="datagrid_ParContents_ContextMenu_mi_Open_Click"/>
                         <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Extract" Header="Extract" Click="datagrid_ParContents_ContextMenu_mi_Extract_Click"/>
+                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch" Header="touch">
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime" Header="Reset time" Click="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime_Click"/>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime" Header="Current time" Click="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click"/>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_SetTime" Header="Set time" Click="datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click"/>
+                        </MenuItem>
                     </ContextMenu>
                     <Style x:Key="Selectable" TargetType="{x:Type DataGridCell}">
                         <Setter Property="BorderThickness" Value="0"/>

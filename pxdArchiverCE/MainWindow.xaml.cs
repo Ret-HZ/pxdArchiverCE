@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Collections.ObjectModel;
 using Yarhl.IO;
+using pxdArchiverCE.Controls;
 
 namespace pxdArchiverCE
 {
@@ -455,6 +456,19 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Update the file date from the <see cref="ParEntry"/> with the specified <see cref="DateTime"/>.
+        /// </summary>
+        /// <param name="parEntry">The ParEntry.</param>
+        /// <param name="date">The date to set.</param>
+        private static void SetParEntryDate(ParEntry parEntry, DateTime date)
+        {
+            if (parEntry.Node.IsContainer) return;
+            ParFile parFile = parEntry.Node.GetFormatAs<ParFile>();
+            parFile.FileDate = date;
+        }
+
+
+        /// <summary>
         /// Window (app) closing event. Will clean up any temp files.
         /// </summary>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -735,6 +749,71 @@ namespace pxdArchiverCE
                     }
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (touch > Reset Time). Will set the selected directory or file date to epoch 0.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Touch_ResetTime_Click(object sender, RoutedEventArgs e)
+        {
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            DateTime resetTime = new DateTime(1970, 1, 1);
+
+            foreach (ParEntry parEntry in parEntries)
+            {
+                SetParEntryDate(parEntry, resetTime);
+            }
+            // Reload directory with changes
+            PopulateDataGrid(NavigationHistoryCurrent);
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (touch > Current Time). Will set the selected directory or file date to the current date.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click(object sender, RoutedEventArgs e)
+        {
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            DateTime currentTime = DateTime.Now;
+
+            foreach (ParEntry parEntry in parEntries)
+            {
+                SetParEntryDate(parEntry, currentTime);
+            }
+            // Reload directory with changes
+            PopulateDataGrid(NavigationHistoryCurrent);
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (touch > Reset Time). Will set the selected directory or file date to a user defined date.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click(object sender, RoutedEventArgs e)
+        {
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            bool isBulk = false;
+            DateTime bulkDate = DateTime.Now;
+
+            foreach (ParEntry parEntry in parEntries)
+            {
+                if (parEntry.Node.IsContainer) continue;
+                if (isBulk)
+                {
+                    SetParEntryDate(parEntry, bulkDate);
+                    continue;
+                }
+                TouchSetTimeDialog touchSetTimeDialog = new TouchSetTimeDialog(parEntry.Name, parEntry.Time);
+                if (touchSetTimeDialog.ShowDialog() == true)
+                {
+                    if (touchSetTimeDialog.IsIgnore) continue;
+                    SetParEntryDate(parEntry, touchSetTimeDialog.NewDate);
+                    isBulk = touchSetTimeDialog.IsBulk;
+                    bulkDate = touchSetTimeDialog.NewDate;
+                }
+            }
+            // Reload directory with changes
+            PopulateDataGrid(NavigationHistoryCurrent);
         }
     }
 
