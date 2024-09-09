@@ -568,6 +568,7 @@ namespace pxdArchiverCE
             {
                 OpenFile(parEntry.Node, parEntry.Directory);
             }
+            e.Handled = true;
         }
 
 
@@ -815,6 +816,218 @@ namespace pxdArchiverCE
             // Reload directory with changes
             PopulateDataGrid(NavigationHistoryCurrent);
         }
+
+
+        #region ItemSelection
+
+        /// <summary>
+        /// Is the mouse left button down? 
+        /// </summary>
+        bool mouseLeftButtonDown = false;
+
+        /// <summary>
+        /// The point where the left mouse button was first clicked.
+        /// </summary>
+        System.Windows.Point mouseLeftButtonDownPos;
+
+        /// <summary>
+        /// Is the par content's DataGrid scrollviewer scrolling up? (By cursor proximity to the upper edge).
+        /// </summary>
+        bool isScrollingUp = false;
+
+        /// <summary>
+        /// Is the par content DataGrid's scrollviewer scrolling down? (By cursor proximity to the lower edge).
+        /// </summary>
+        bool isScrollingDown = false;
+
+        /// <summary>
+        /// Direction of the last scrollviewer scroll.
+        /// </summary>
+        ScrollDirection lastScrollDirection = ScrollDirection.NONE;
+
+        /// <summary>
+        /// The <see cref="ScrollViewer"/> of the par content DataGrid.
+        /// </summary>
+        ScrollViewer scrollViewer;
+
+
+        /// <summary>
+        /// Mouse left button down event for the DataGrid. Will prepare and start drawing the selection box.
+        /// </summary>
+        private void datagrid_ParContents_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Capture and track the mouse
+            mouseLeftButtonDown = true;
+            mouseLeftButtonDownPos = e.GetPosition(datagrid_ParContents);
+            datagrid_ParContents.CaptureMouse();
+
+            // Initial placement of the selection box
+            Canvas.SetLeft(rectangle_SelectionBox, mouseLeftButtonDownPos.X);
+            Canvas.SetTop(rectangle_SelectionBox, mouseLeftButtonDownPos.Y);
+            rectangle_SelectionBox.Width = 0;
+            rectangle_SelectionBox.Height = 0;
+
+            // Make the selection box visible
+            rectangle_SelectionBox.Visibility = Visibility.Visible;
+
+            // Clear the selected cells
+            datagrid_ParContents.SelectedCells.Clear();
+        }
+
+
+        /// <summary>
+        /// Mouse left button up event for the DataGrid. Will reset and hide the selection box.
+        /// </summary>
+        private void datagrid_ParContents_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Release the mouse capture and stop tracking it
+            mouseLeftButtonDown = false;
+            datagrid_ParContents.ReleaseMouseCapture();
+
+            // Reset the selection box and hide it
+            Canvas.SetLeft(rectangle_SelectionBox, 0);
+            Canvas.SetTop(rectangle_SelectionBox, 0);
+            rectangle_SelectionBox.Width = 0;
+            rectangle_SelectionBox.Height = 0;
+            rectangle_SelectionBox.Visibility = Visibility.Collapsed;
+
+            // Reset the scroll tracker
+            lastScrollDirection = ScrollDirection.NONE;
+        }
+
+
+        /// <summary>
+        /// Mouse move event for the DataGrid. Will resize the selection box based on the cursor's position and select/deselect the items underneath it.
+        /// </summary>
+        private void datagrid_ParContents_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // Reposition the selection box if the button is held
+            if (mouseLeftButtonDown)
+            {
+                System.Windows.Point mousePos = e.GetPosition(datagrid_ParContents);
+
+                // Prevent the selection box from getting out of the DataGrid control bounds
+                if (mousePos.X < 0) mousePos.X = 0;
+                if (mousePos.Y < 0) mousePos.Y = 0;
+
+                isScrollingUp = ((mousePos.Y - 25) <= 0);
+                isScrollingDown = ((mousePos.Y + 25) >= datagrid_ParContents.ActualHeight);
+                if (isScrollingUp) lastScrollDirection = ScrollDirection.UP;
+                if (isScrollingDown) lastScrollDirection = ScrollDirection.DOWN;
+
+                if (mouseLeftButtonDownPos.X < mousePos.X)
+                {
+                    Canvas.SetLeft(rectangle_SelectionBox, mouseLeftButtonDownPos.X);
+                    rectangle_SelectionBox.Width = mousePos.X - mouseLeftButtonDownPos.X;
+                }
+                else
+                {
+                    Canvas.SetLeft(rectangle_SelectionBox, mousePos.X);
+                    rectangle_SelectionBox.Width = mouseLeftButtonDownPos.X - mousePos.X;
+                }
+
+                if (mouseLeftButtonDownPos.Y < mousePos.Y)
+                {
+                    Canvas.SetTop(rectangle_SelectionBox, mouseLeftButtonDownPos.Y);
+                    rectangle_SelectionBox.Height = mousePos.Y - mouseLeftButtonDownPos.Y;
+                }
+                else
+                {
+                    Canvas.SetTop(rectangle_SelectionBox, mousePos.Y);
+                    rectangle_SelectionBox.Height = mouseLeftButtonDownPos.Y - mousePos.Y;
+                }
+
+                System.Windows.Point selectionBoxRelativePoint = rectangle_SelectionBox.TranslatePoint(new System.Windows.Point(0, 0), canvas_SelectionBox);
+                Rect selectionBoxArea = new Rect(selectionBoxRelativePoint.X, selectionBoxRelativePoint.Y, rectangle_SelectionBox.Width, rectangle_SelectionBox.Height);
+
+                // Has the current iteration reached an entry that is inside the selection box?
+                bool hasReachedSelectionBox = false;
+                // Has the current iteration reached an entry that is outside the selection box?
+                bool hasExitedSelectionBox = false;
+                for (int i = 0; i < datagrid_ParContents.Items.Count; i++)
+                {
+                    datagrid_ParContents.Focus();
+                    DataGridCellInfo cellInfo = new DataGridCellInfo(datagrid_ParContents.Items[i], datagrid_ParContents.Columns[1]); // Get the Name cell (second column)
+                    FrameworkElement cellContent = cellInfo.Column.GetCellContent(cellInfo.Item);
+
+                    if (cellContent != null)
+                    {
+                        DataGridCell cell = cellContent.Parent as DataGridCell;
+                        if (cell != null)
+                        {
+                            System.Windows.Point relativeCellLocation = cell.TranslatePoint(new System.Windows.Point(0, 0), datagrid_ParContents);
+                            Rect cellBoundingBox = new Rect(relativeCellLocation.X, relativeCellLocation.Y, cell.ActualWidth, cell.ActualHeight);
+
+                            // Select cells if they are inside the selection box
+                            if (selectionBoxArea.IntersectsWith(cellBoundingBox))
+                            {
+                                hasReachedSelectionBox = true;
+                                if (!datagrid_ParContents.SelectedCells.Contains(cellInfo))
+                                {
+                                    datagrid_ParContents.SelectedCells.Add(cellInfo);
+                                }
+                            }
+                            // Deselect cells if they arent inside the selection box only if they havent been part of a scroll selection
+                            else
+                            {
+                                if (hasReachedSelectionBox) hasExitedSelectionBox = true;
+                                
+                                if (isScrollingUp || lastScrollDirection == ScrollDirection.UP)
+                                {
+                                    if (!hasReachedSelectionBox && datagrid_ParContents.SelectedCells.Contains(cellInfo))
+                                    {
+                                        datagrid_ParContents.SelectedCells.Remove(cellInfo);
+                                    }
+                                }
+                                else if (isScrollingDown || lastScrollDirection == ScrollDirection.DOWN)
+                                {
+                                    if (hasReachedSelectionBox && hasExitedSelectionBox && datagrid_ParContents.SelectedCells.Contains(cellInfo))
+                                    {
+                                        datagrid_ParContents.SelectedCells.Remove(cellInfo);
+                                    }
+                                }
+                                else if (datagrid_ParContents.SelectedCells.Contains(cellInfo))
+                                {
+                                    datagrid_ParContents.SelectedCells.Remove(cellInfo);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Scroll when the mouse approaches the edge
+                if (isScrollingDown)
+                {
+                    scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + 1.0);
+                }
+                else if (isScrollingUp)
+                {
+                    scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - 1.0);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Loaded event for the par content DataGrid. Will locate the <see cref="ScrollViewer"/>.
+        /// </summary>
+        private void datagrid_ParContents_Loaded(object sender, RoutedEventArgs e)
+        {
+            scrollViewer = Util.FindVisualChild<ScrollViewer>(datagrid_ParContents);
+        }
+
+        #endregion
+    }
+
+
+    /// <summary>
+    /// Direction the scroll was performed.
+    /// </summary>
+    enum ScrollDirection
+    {
+        NONE,
+        UP,
+        DOWN,
     }
 
 

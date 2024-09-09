@@ -105,65 +105,74 @@
             </Grid>
 
             <GridSplitter Grid.Column="0" Width="5"/>
-            
-            <DataGrid Grid.Column="1" x:Name="datagrid_ParContents" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
-                      ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" IsReadOnly="True" AutoGenerateColumns="False"
-                      CanUserResizeRows="False" CanUserReorderColumns="False">
-                <DataGrid.Resources>
-                    <Style TargetType="{x:Type DataGridCell}">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                        <Setter Property="Focusable" Value="False"/>
-                        <Setter Property="IsTabStop" Value="False"/>
-                        <Setter Property="IsHitTestVisible" Value="False"/>
-                        <Setter Property="Margin" Value="10,2,30,2"/>
-                    </Style>
-                    <Style x:Key="NoMargin" TargetType="{x:Type DataGridCell}">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                        <Setter Property="Focusable" Value="False"/>
-                        <Setter Property="IsTabStop" Value="False"/>
-                        <Setter Property="IsHitTestVisible" Value="False"/>
-                        <Setter Property="Margin" Value="0"/>
-                    </Style>
-                    <ContextMenu  x:Key="SelectableColumnContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Open" Header="Open" FontWeight="Bold" Click="datagrid_ParContents_ContextMenu_mi_Open_Click"/>
-                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Extract" Header="Extract" Click="datagrid_ParContents_ContextMenu_mi_Extract_Click"/>
-                        <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch" Header="touch">
-                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime" Header="Reset time" Click="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime_Click"/>
-                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime" Header="Current time" Click="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click"/>
-                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_SetTime" Header="Set time" Click="datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click"/>
-                        </MenuItem>
-                    </ContextMenu>
-                    <Style x:Key="Selectable" TargetType="{x:Type DataGridCell}">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                        <Setter Property="Focusable" Value="True"/>
-                        <Setter Property="IsTabStop" Value="True"/>
-                        <Setter Property="IsHitTestVisible" Value="True"/>
-                        <Setter Property="Margin" Value="10,2,30,2"/>
-                        <Setter Property="ContextMenu" Value="{StaticResource SelectableColumnContextMenu}"/>
-                        <EventSetter Event="MouseDoubleClick" Handler="DataGridCell_MouseDoubleClick"/>
-                    </Style>
-                </DataGrid.Resources>
-                
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="" Width="SizeToCells" CanUserSort="False" CanUserResize="False" CellStyle="{StaticResource NoMargin}">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image Source="{Binding Icon}" Height="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="Linear"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" CellStyle="{StaticResource Selectable}"/>
-                    <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
-                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" CanUserSort="False"/>
-                    <DataGridTextColumn Header="Compressed Size" Binding="{Binding CompressedSize}" CanUserSort="False"/>
-                    <DataGridTextColumn Header="Ratio" Binding="{Binding Ratio}" CanUserSort="False"/>
-                    <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}"/>
-                    <DataGridTextColumn Header="Directory" Binding="{Binding Directory}" CanUserSort="False"/>
-                </DataGrid.Columns>
-            </DataGrid>
+
+
+            <Grid Grid.Column="1" x:Name="grid_ParContentsParent">
+                <DataGrid x:Name="datagrid_ParContents" Background="White" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
+                       IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      CanUserResizeRows="False" CanUserReorderColumns="False" SelectionMode="Extended" MouseLeftButtonDown="datagrid_ParContents_MouseLeftButtonDown" MouseLeftButtonUp="datagrid_ParContents_MouseLeftButtonUp" 
+                      MouseMove="datagrid_ParContents_MouseMove" Loaded="datagrid_ParContents_Loaded">
+                    <DataGrid.Resources>
+                        <Style TargetType="{x:Type DataGridCell}">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="IsTabStop" Value="False"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Margin" Value="10,0,30,0"/>
+                        </Style>
+                        <Style x:Key="NoMargin" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="IsTabStop" Value="False"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+                        <ContextMenu  x:Key="SelectableColumnContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Open" Header="Open" FontWeight="Bold" Click="datagrid_ParContents_ContextMenu_mi_Open_Click"/>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Extract" Header="Extract" Click="datagrid_ParContents_ContextMenu_mi_Extract_Click"/>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch" Header="touch">
+                                <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime" Header="Reset time" Click="datagrid_ParContents_ContextMenu_mi_Touch_ResetTime_Click"/>
+                                <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime" Header="Current time" Click="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click"/>
+                                <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_SetTime" Header="Set time" Click="datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click"/>
+                            </MenuItem>
+                        </ContextMenu>
+                        <Style x:Key="Selectable" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="Focusable" Value="True"/>
+                            <Setter Property="IsTabStop" Value="True"/>
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                            <Setter Property="Margin" Value="10,0,30,0"/>
+                            <Setter Property="ContextMenu" Value="{StaticResource SelectableColumnContextMenu}"/>
+                            <EventSetter Event="MouseDoubleClick" Handler="DataGridCell_MouseDoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" Width="SizeToCells" CanUserSort="False" CanUserResize="False" CellStyle="{StaticResource NoMargin}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding Icon}" Height="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="Linear"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" CellStyle="{StaticResource Selectable}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" CanUserSort="False"/>
+                        <DataGridTextColumn Header="Compressed Size" Binding="{Binding CompressedSize}" CanUserSort="False"/>
+                        <DataGridTextColumn Header="Ratio" Binding="{Binding Ratio}" CanUserSort="False"/>
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}"/>
+                        <DataGridTextColumn Header="Directory" Binding="{Binding Directory}" CanUserSort="False"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Click-through canvas overlay to render the selection box -->
+                <Canvas x:Name="canvas_SelectionBox" IsHitTestVisible="False">
+                    <Rectangle x:Name="rectangle_SelectionBox" Visibility="Collapsed" Stroke="Black" StrokeThickness="1.5" StrokeDashArray="1,1" Fill="#3049a6f2"/>
+                </Canvas>
+            </Grid>
         </Grid>
         
     </Grid>
