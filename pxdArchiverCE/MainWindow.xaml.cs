@@ -260,6 +260,17 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Repopulate the <see cref="DataGrid"/> with the contents of the currently opened directory <see cref="Node"/>.
+        /// </summary>
+        private void RefreshCurrentDirectory()
+        {
+            if (NavigationHistoryCurrent == null) return;
+            PopulateDataGrid(NavigationHistoryCurrent);
+            UpdateNavigationToolbar();
+        }
+
+
+        /// <summary>
         /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
         /// </summary>
         /// <param name="rootNode">The node to act as root of the directory.</param>
@@ -307,8 +318,17 @@ namespace pxdArchiverCE
                     type = Util.GetFileTypeDescription(Path.GetExtension(node.Name));
                 }
 
-                size = Util.FormatBytes(sizeBytes);
-                compressedSize = Util.FormatBytes(sizeBytesCompressed);
+                if (Settings.SizeDisplayUnit == SizeDisplayUnit.BYTES)
+                {
+                    size = $"{sizeBytes} B";
+                    compressedSize = $"{sizeBytesCompressed} B";
+                }
+                // AUTO
+                else
+                {
+                    size = Util.FormatBytes(sizeBytes);
+                    compressedSize = Util.FormatBytes(sizeBytesCompressed);
+                }
                 ratio = $"{(sizeBytes > 0 ? (int)((1.0 * sizeBytesCompressed / sizeBytes) * 100) : "---")}%";
 
                 entries.Add(
@@ -655,6 +675,8 @@ namespace pxdArchiverCE
         {
             mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
+            mi_Settings_SizeDisplayUnitAuto.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.AUTO;
+            mi_Settings_SizeDisplayUnitBytes.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.BYTES;
         }
 
 
@@ -677,6 +699,34 @@ namespace pxdArchiverCE
             Settings.LegacyMode = !Settings.LegacyMode;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
             Settings.SaveSettings();
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (SizeDisplayUnit) MenuItem. Will change the size display value.
+        /// </summary>
+        private void mi_Settings_SizeDisplayUnit_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem mi = sender as MenuItem;
+            switch (mi.Tag)
+            {
+                case "AUTO":
+                    {
+                        Settings.SizeDisplayUnit = SizeDisplayUnit.AUTO;
+                        mi_Settings_SizeDisplayUnitAuto.IsChecked = true;
+                        mi_Settings_SizeDisplayUnitBytes.IsChecked = false;
+                        break;
+                    }
+                case "BYTES":
+                    {
+                        Settings.SizeDisplayUnit = SizeDisplayUnit.BYTES;
+                        mi_Settings_SizeDisplayUnitAuto.IsChecked = false;
+                        mi_Settings_SizeDisplayUnitBytes.IsChecked = true;
+                        break;
+                    }
+            }
+            Settings.SaveSettings();
+            RefreshCurrentDirectory();
         }
 
 
