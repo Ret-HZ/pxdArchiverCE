@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pxd="clr-namespace:pxdArchiverCE.Controls"
         xmlns:local="clr-namespace:pxdArchiverCE"
         mc:Ignorable="d"
         Title="PXD Archiver Community Edition" Height="650" Width="1200" Closing="Window_Closing">
@@ -92,6 +93,7 @@
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                             <EventSetter Event="MouseLeftButtonUp" Handler="TreeViewItem_MouseLeftButtonUp"/>
+                            <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
                         </Style>
                         <HierarchicalDataTemplate DataType="{x:Type local:ParDirectory}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
@@ -112,7 +114,7 @@
 
 
             <Grid Grid.Column="1" x:Name="grid_ParContentsParent">
-                <DataGrid x:Name="datagrid_ParContents" Background="White" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
+                <pxd:PxdDataGrid x:Name="datagrid_ParContents" Background="White" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
                        IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Visible"
                       CanUserResizeRows="False" CanUserReorderColumns="False" SelectionMode="Extended" MouseLeftButtonDown="datagrid_ParContents_MouseLeftButtonDown" MouseLeftButtonUp="datagrid_ParContents_MouseLeftButtonUp" 
                       MouseMove="datagrid_ParContents_MouseMove" Loaded="datagrid_ParContents_Loaded">
@@ -149,8 +151,12 @@
                             <Setter Property="IsTabStop" Value="True"/>
                             <Setter Property="IsHitTestVisible" Value="True"/>
                             <Setter Property="Margin" Value="10,0,30,0"/>
+                            <Setter Property="AllowDrop" Value="True"/>
                             <Setter Property="ContextMenu" Value="{StaticResource SelectableColumnContextMenu}"/>
                             <EventSetter Event="MouseDoubleClick" Handler="DataGridCell_MouseDoubleClick"/>
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGridCell_MouseLeftButtonDown"/>
+                            <EventSetter Event="MouseLeftButtonUp" Handler="DataGridCell_MouseLeftButtonUp"/>
+                            <EventSetter Event="Drop" Handler="DataGridCell_Drop"/>
                         </Style>
                     </DataGrid.Resources>
 
@@ -170,7 +176,7 @@
                         <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat=\{0:dd/MM/yyyy HH:mm:ss\}}"/>
                         <DataGridTextColumn Header="Directory" Binding="{Binding Directory}" CanUserSort="False"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                </pxd:PxdDataGrid>
 
                 <!-- Click-through canvas overlay to render the selection box -->
                 <Canvas x:Name="canvas_SelectionBox" IsHitTestVisible="False">

@@ -10,6 +10,8 @@ using System.Drawing;
 using System.Collections.ObjectModel;
 using Yarhl.IO;
 using pxdArchiverCE.Controls;
+using System.Windows.Input;
+using System.Text;
 
 namespace pxdArchiverCE
 {
@@ -47,6 +49,11 @@ namespace pxdArchiverCE
         /// Currently opened node.
         /// </summary>
         Node NavigationHistoryCurrent;
+
+        /// <summary>
+        /// ProgressManager instance for file transfers.
+        /// </summary>
+        ProgressManager ProgressManager { get; set; }
 
 
         public MainWindow()
@@ -285,6 +292,7 @@ namespace pxdArchiverCE
             {
                 long sizeBytes = 0;
                 long sizeBytesCompressed = 0;
+                long totalSize = 0;
 
                 string type;
                 string size;
@@ -330,6 +338,7 @@ namespace pxdArchiverCE
                     compressedSize = Util.FormatBytes(sizeBytesCompressed);
                 }
                 ratio = $"{(sizeBytes > 0 ? (int)((1.0 * sizeBytesCompressed / sizeBytes) * 100) : "---")}%";
+                totalSize = sizeBytes;
 
                 entries.Add(
                     new ParEntry()
@@ -343,6 +352,7 @@ namespace pxdArchiverCE
                         Time = time,
                         Directory = directory,
                         Node = node,
+                        TotalSize = totalSize,
                     });
             }
 
@@ -489,7 +499,66 @@ namespace pxdArchiverCE
 
 
         /// <summary>
-        /// Window (app) closing event. Will clean up any temp files.
+        /// Checks if the destination node is a container and, if it is, transfers the dragged files/directories to it.
+        /// </summary>
+        /// <param name="dragEventArgs"></param>
+        /// <param name="destinationNode">The <see cref="Node"/> that will contain the dragged files.</param>
+        private void FileDropEventOnFolder(DragEventArgs dragEventArgs, Node destinationNode)
+        {
+            if (!destinationNode.IsContainer) return;
+
+            // Check for node path text in case it is an internal drag operation.
+            try
+            {
+                string nodePathsString = (string)dragEventArgs.Data.GetData(DataFormats.Text);
+                if (nodePathsString != null && nodePathsString.Length > 0)
+                {
+                    string[] lines = nodePathsString.TrimEnd().Split(new string[] { "\n" }, StringSplitOptions.None);
+                    foreach (string line in lines)
+                    {
+                        if (!line.StartsWith("node://")) continue;
+                        string nodePath = line.Replace("node://", "");
+                        Node node = Navigator.SearchNode(PXDArchive, nodePath);
+                        if (node != null && node != destinationNode)
+                        {
+                            destinationNode.Add(node);
+                        }
+                    }
+                    RefreshCurrentDirectory();
+                    PopulateTreeView(PXDArchive);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            // Check for file in case it is an external drag operation.
+            string[] files = (string[])dragEventArgs.Data.GetData(DataFormats.FileDrop);
+            if (files != null && files.Length > 0)
+            {
+                foreach (string file in files)
+                {
+                    if (File.Exists(file))
+                    {
+                        NodeUtils.AddFile(destinationNode, file);
+                    }
+                    else if (Directory.Exists(file))
+                    {
+                        NodeUtils.AddDirectory(destinationNode, file);
+                    }
+                }
+
+                RefreshCurrentDirectory();
+                PopulateTreeView(PXDArchive);
+                return;
+            }
+        }
+
+
+        /// <summary>
+        /// Window (app) closing event. Will clean up any temp fileDescriptors.
         /// </summary>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -578,6 +647,9 @@ namespace pxdArchiverCE
         /// </summary>
         private void DataGridCell_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            //Event is not a cell drag
+            isCheckDragCell = false;
+
             DataGridCell cell = (DataGridCell)sender;
             ParEntry parEntry = (ParEntry)cell.DataContext;
             if (parEntry.Node.IsContainer)
@@ -597,12 +669,25 @@ namespace pxdArchiverCE
         /// </summary>
         private void TreeViewItem_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (isMouseLeftButtonDownDragCell) return;
             TreeViewItem treeViewItem = (TreeViewItem)sender;
             if (treeViewItem.IsSelected)
             {
                 ParDirectory parDirectory = (ParDirectory)treeViewItem.DataContext;
                 OpenDirectory(parDirectory.Node);
             }
+        }
+
+
+        /// <summary>
+        /// Drag event for TreeView items (folders). Will move the dragged files to the folder <see cref="Node"/>.
+        /// </summary>
+        private void TreeViewItem_Drop(object sender, DragEventArgs e)
+        {
+            TreeViewItem tvi = sender as TreeViewItem;
+            ParDirectory parDirectory = (ParDirectory)tvi.DataContext;
+            FileDropEventOnFolder(e, parDirectory.Node);
+            e.Handled = true;
         }
 
 
@@ -661,7 +746,7 @@ namespace pxdArchiverCE
         private void grid_ParDirectory_Drop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (files.Length > 0)
+            if (files!= null && files.Length > 0)
             {
                 OpenPAR(files[0]);
             }
@@ -777,7 +862,7 @@ namespace pxdArchiverCE
                 }
                 else return;
             }
-            // Multiple files or directories
+            // Multiple fileDescriptors or directories
             else
             {
                 var openFolderDialog = new OpenFolderDialog
@@ -873,7 +958,7 @@ namespace pxdArchiverCE
         /// <summary>
         /// Is the mouse left button down? 
         /// </summary>
-        bool mouseLeftButtonDown = false;
+        bool isMouseLeftButtonDownSelection = false;
 
         /// <summary>
         /// The point where the left mouse button was first clicked.
@@ -906,8 +991,16 @@ namespace pxdArchiverCE
         /// </summary>
         private void datagrid_ParContents_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (isClickingCell)
+            {
+                return;
+            }
+
+            //Event is not a cell drag
+            isCheckDragCell = false;
+
             // Capture and track the mouse
-            mouseLeftButtonDown = true;
+            isMouseLeftButtonDownSelection = true;
             mouseLeftButtonDownPos = e.GetPosition(datagrid_ParContents);
             datagrid_ParContents.CaptureMouse();
 
@@ -931,7 +1024,7 @@ namespace pxdArchiverCE
         private void datagrid_ParContents_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             // Release the mouse capture and stop tracking it
-            mouseLeftButtonDown = false;
+            isMouseLeftButtonDownSelection = false;
             datagrid_ParContents.ReleaseMouseCapture();
 
             // Reset the selection box and hide it
@@ -943,6 +1036,8 @@ namespace pxdArchiverCE
 
             // Reset the scroll tracker
             lastScrollDirection = ScrollDirection.NONE;
+
+            isClickingCell = false;
         }
 
 
@@ -951,8 +1046,15 @@ namespace pxdArchiverCE
         /// </summary>
         private void datagrid_ParContents_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            // This should not happen
+            if (isClickingCell && Mouse.LeftButton == MouseButtonState.Released)
+            {
+                isClickingCell = false;
+            }
+
+            #region SelectionMouseMove
             // Reposition the selection box if the button is held
-            if (mouseLeftButtonDown)
+            if (isMouseLeftButtonDownSelection)
             {
                 System.Windows.Point mousePos = e.GetPosition(datagrid_ParContents);
 
@@ -1055,6 +1157,141 @@ namespace pxdArchiverCE
                     scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - 1.0);
                 }
             }
+            #endregion
+
+
+            #region DragDropMouseMove
+            // Mouse left click is being held down.
+            if (isCheckDragCell)
+            {
+                var currentMousePos = e.GetPosition(datagrid_ParContents);
+
+                // Check if the mouse has moved a significant distance since the left click was held down.
+                if (isCheckDragCell)
+                {
+                    if (Math.Abs(mouseLeftButtonDownDragCellPos.X - currentMousePos.X) >= 10 || Math.Abs(mouseLeftButtonDownDragCellPos.Y - currentMousePos.Y) >= 10)
+                    {
+                        isMouseLeftButtonDownDragCell = true;
+                        isCheckDragCell = false;
+                    }
+                }
+
+                // Perform the drag event
+                if (isMouseLeftButtonDownDragCell)
+                {
+                    datagrid_ParContents.SelectedCells.Clear();
+                    foreach (var selection in selectedCellHistory)
+                    {
+                        datagrid_ParContents.SelectedCells.Add(selection);
+                    }
+                    List<ParEntry> selectedEntries = GetSelectedParEntries();
+                    if (selectedEntries.Count > 0)
+                    {
+                        var virtualFileDataObject = new VirtualFileDataObject(StartDragDrop, EndDragDrop);
+                        var fileDescriptors = new List<VirtualFileDataObject.FileDescriptor>();
+                        string nodePaths = string.Empty;
+                        long totalSelectionSize = 0;
+
+                        // Populate file descriptor list, node paths and total selection size.
+                        foreach (ParEntry parEntry in selectedEntries)
+                        {
+                            fileDescriptors.AddRange(PopulateVirtualFileDataObjectFileDescriptorListFromNode(parEntry.Node));
+                            nodePaths += $"node://{parEntry.Node.Path}\n";
+
+                            totalSelectionSize += parEntry.TotalSize;
+                        }
+                        virtualFileDataObject.SetData(fileDescriptors);
+                        virtualFileDataObject.SetData((short)(DataFormats.GetDataFormat(DataFormats.Text).Id), Encoding.UTF8.GetBytes($"{nodePaths}\0"));
+
+                        ProgressManager = new ProgressManager(fileDescriptors.Count);
+                        ProgressManager.PrepareWindowText($"Extracting {fileDescriptors.Count} files", $"Extracting {fileDescriptors.Count} files ({Util.FormatBytes(totalSelectionSize)})");
+
+                        VirtualFileDataObject.DoDragDrop(datagrid_ParContents, virtualFileDataObject, DragDropEffects.Copy);
+                    }
+
+                    isCheckDragCell = false;
+                    isMouseLeftButtonDownDragCell = false;
+                    isClickingCell = false;
+                }
+            }
+            #endregion
+        }
+
+
+        private void StartDragDrop(VirtualFileDataObject data)
+        {
+            if (ProgressManager != null)
+            {
+                Application.Current.Dispatcher.BeginInvoke(() => ProgressManager.ShowProgressDialog());
+            }
+        }
+
+
+        private void EndDragDrop(VirtualFileDataObject data)
+        {
+            if (ProgressManager != null)
+            {
+                Application.Current.Dispatcher.BeginInvoke(() => ProgressManager.CloseProgressDialog());
+            }
+        }
+
+
+        private List<VirtualFileDataObject.FileDescriptor> PopulateVirtualFileDataObjectFileDescriptorListFromNode(Node node, string directory = "")
+        {
+            List<VirtualFileDataObject.FileDescriptor> returnList = new List<VirtualFileDataObject.FileDescriptor>();
+            if (node.IsContainer)
+            {
+                foreach(Node child in node.Children)
+                {
+                    returnList.AddRange(PopulateVirtualFileDataObjectFileDescriptorListFromNode(child, Path.Combine(directory, node.Name)));
+                }
+            }
+            else
+            {
+                var originalParFile = node.GetFormatAs<ParFile>();
+                var fileDescriptor = new VirtualFileDataObject.FileDescriptor();
+                fileDescriptor.Name = Path.Combine(directory, node.Name);
+                fileDescriptor.ChangeTimeUtc = originalParFile.FileDate;
+                fileDescriptor.StreamContents = stream =>
+                {
+                    if (ProgressManager != null)
+                    {
+                        if (ProgressManager.CheckIsCancelledByUser())
+                        {
+                            throw new Exception("Operation cancelled by user"); // Dirty way of exiting
+                        }
+
+                        // Execute on the UI thread
+                        Application.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            ProgressManager.SetDescriptionText(node.Name);
+                            ProgressManager.UpdateProgress();
+                        });
+                    }
+
+                    //Yarhl's deep clone does not properly clone formats and attributes so they need to be set manually
+                    Node nodeTemp = new Node(node).TransformWith(new ParFile());
+                    var parFile = nodeTemp.GetFormatAs<ParFile>();
+                    parFile.CanBeCompressed = originalParFile.CanBeCompressed;
+                    parFile.IsCompressed = originalParFile.IsCompressed;
+                    parFile.DecompressedSize = originalParFile.DecompressedSize;
+                    parFile.Attributes = originalParFile.Attributes;
+                    parFile.FileDate = originalParFile.FileDate;
+
+                    if (parFile.IsCompressed)
+                    {
+                        nodeTemp.TransformWith<ParLibrary.Sllz.Decompressor>();
+                    }
+
+                    nodeTemp.Stream.WriteTo(stream);
+                    parFile.Dispose();
+                    nodeTemp.Dispose();
+                };
+
+                returnList.Add(fileDescriptor);
+            }
+
+            return returnList;
         }
 
 
@@ -1067,6 +1304,62 @@ namespace pxdArchiverCE
         }
 
         #endregion
+
+        
+        bool isClickingCell = false;
+        bool isMouseLeftButtonDownDragCell = false;
+        bool isCheckDragCell = false;
+        System.Windows.Point mouseLeftButtonDownDragCellPos;
+        List<DataGridCellInfo> selectedCellHistory = new List<DataGridCellInfo>();
+        private void DataGridCell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DataGridCell)
+            {
+                var cell = sender as DataGridCell;
+                if (cell.IsSelected)
+                {
+                    selectedCellHistory = new List<DataGridCellInfo>(datagrid_ParContents.SelectedCells);
+                }
+                else
+                {
+                    selectedCellHistory.Clear();
+                    datagrid_ParContents.SelectedCells.Clear();
+                    DataGridCellInfo cellInfo = new DataGridCellInfo(cell.DataContext, cell.Column);
+                    selectedCellHistory.Add(cellInfo);
+                    datagrid_ParContents.SelectedCells.Add(cellInfo);
+                }
+
+                mouseLeftButtonDownDragCellPos = e.GetPosition(datagrid_ParContents);
+                isCheckDragCell = true;
+                isMouseLeftButtonDownSelection = false;
+                isClickingCell = true;
+            }
+        }
+
+
+        /// <summary>
+        /// Left button up event for the <see cref="DataGrid"/> cells. Will update values related to the state of selections or drags.
+        /// </summary>
+        private void DataGridCell_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isCheckDragCell = false;
+            isMouseLeftButtonDownDragCell = false;
+            isClickingCell = false;
+        }
+
+
+        /// <summary>
+        /// Drop event for the <see cref="DataGrid"/> cells. Will add or move files to a directory node.
+        /// </summary>
+        private void DataGridCell_Drop(object sender, DragEventArgs e)
+        {
+            DataGridCell cell = sender as DataGridCell;
+            ParEntry parEntry = (ParEntry)cell.DataContext;
+            if (parEntry != null)
+            {
+                FileDropEventOnFolder(e, parEntry.Node);
+            }
+        }
     }
 
 
@@ -1098,6 +1391,7 @@ namespace pxdArchiverCE
         public string Ratio { get; set; }
         public DateTime Time { get; set; }
         public string Directory { get; set; }
+        internal long TotalSize { get; set; } // Used to display the approximate size when performing file extractions
     }
 
 
