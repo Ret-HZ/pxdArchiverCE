@@ -49,7 +49,11 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="About pxdArchiverCE"/>
+                <MenuItem x:Name="mi_Help_About" Header="About pxdArchiverCE" Click="mi_Help_About_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Icons/pxdArchiverCE/pxdArchiverCE_16.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

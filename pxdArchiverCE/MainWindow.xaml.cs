@@ -849,6 +849,16 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Help (About pxdArchiverCE) MenuItem. Will open the About window.
+        /// </summary>
+        private void mi_Help_About_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
+        }
+
+
+        /// <summary>
         /// Click event for the DataGrid's ContextMenu MenuItem (Open). Will open the selected directory or file.
         /// </summary>
         private void datagrid_ParContents_ContextMenu_mi_Open_Click(object sender, RoutedEventArgs e)
