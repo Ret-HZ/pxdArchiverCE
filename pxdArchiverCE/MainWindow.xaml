@@ -94,6 +94,8 @@
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                             <EventSetter Event="MouseLeftButtonUp" Handler="TreeViewItem_MouseLeftButtonUp"/>
                             <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
+                            <EventSetter Event="DragEnter" Handler="TreeViewItem_DragEnter"/>
+                            <EventSetter Event="DragLeave" Handler="TreeViewItem_DragLeave"/>
                         </Style>
                         <HierarchicalDataTemplate DataType="{x:Type local:ParDirectory}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
@@ -157,6 +159,8 @@
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGridCell_MouseLeftButtonDown"/>
                             <EventSetter Event="MouseLeftButtonUp" Handler="DataGridCell_MouseLeftButtonUp"/>
                             <EventSetter Event="Drop" Handler="DataGridCell_Drop"/>
+                            <EventSetter Event="DragEnter" Handler="DataGridCell_DragEnter"/>
+                            <EventSetter Event="DragLeave" Handler="DataGridCell_DragLeave"/>
                         </Style>
                     </DataGrid.Resources>
 

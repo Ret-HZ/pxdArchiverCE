@@ -55,6 +55,17 @@ namespace pxdArchiverCE
         /// </summary>
         ProgressManager ProgressManager { get; set; }
 
+        /// <summary>
+        /// Color used to highlight files/folders on hover during a drag event.
+        /// </summary>
+        readonly static System.Windows.Media.Color COLOR_DRAG_HOVER = System.Windows.Media.Color.FromArgb(100, 105, 208, 245);
+
+        /// <summary>
+        /// Color brush used to highlight files/folders on hover during a drag event.
+        /// </summary>
+        readonly System.Windows.Media.SolidColorBrush COLOR_BRUSH_DRAG_HOVER = new System.Windows.Media.SolidColorBrush(COLOR_DRAG_HOVER);
+
+
 
         public MainWindow()
         {
@@ -687,6 +698,28 @@ namespace pxdArchiverCE
             TreeViewItem tvi = sender as TreeViewItem;
             ParDirectory parDirectory = (ParDirectory)tvi.DataContext;
             FileDropEventOnFolder(e, parDirectory.Node);
+            e.Handled = true;
+        }
+
+
+        /// <summary>
+        /// Drag enter event for TreeView items (folders). Will highlight the hovered item by changing the background color.
+        /// </summary>
+        private void TreeViewItem_DragEnter(object sender, DragEventArgs e)
+        {
+            TreeViewItem tvi = sender as TreeViewItem;
+            tvi.Background = COLOR_BRUSH_DRAG_HOVER;
+            e.Handled = true;
+        }
+
+
+        /// <summary>
+        /// Drag leave event for TreeView items (folders). Will remove the highlight background color.
+        /// </summary>
+        private void TreeViewItem_DragLeave(object sender, DragEventArgs e)
+        {
+            TreeViewItem tvi = sender as TreeViewItem;
+            tvi.ClearValue(BackgroundProperty);
             e.Handled = true;
         }
 
@@ -1359,6 +1392,27 @@ namespace pxdArchiverCE
             {
                 FileDropEventOnFolder(e, parEntry.Node);
             }
+        }
+
+
+        /// <summary>
+        /// Drag enter event for the <see cref="DataGrid"/> cells. Will highlight the hovered cell by changing the background color.
+        /// </summary>
+        private void DataGridCell_DragEnter(object sender, DragEventArgs e)
+        {
+            DataGridCell cell = sender as DataGridCell;
+            if (cell.IsSelected) return;
+            cell.Background = COLOR_BRUSH_DRAG_HOVER;
+        }
+
+
+        /// <summary>
+        /// Drag leave event for the <see cref="DataGrid"/> cells. Will remove the highlight background color.
+        /// </summary>
+        private void DataGridCell_DragLeave(object sender, DragEventArgs e)
+        {
+            DataGridCell cell = sender as DataGridCell;
+            cell.ClearValue(BackgroundProperty);
         }
     }
 
