@@ -695,6 +695,7 @@ namespace pxdArchiverCE
         /// </summary>
         private void TreeViewItem_Drop(object sender, DragEventArgs e)
         {
+            TreeViewItem_DragLeave(sender, e); // Clear the hover highlight
             TreeViewItem tvi = sender as TreeViewItem;
             ParDirectory parDirectory = (ParDirectory)tvi.DataContext;
             FileDropEventOnFolder(e, parDirectory.Node);
@@ -1396,6 +1397,7 @@ namespace pxdArchiverCE
         /// </summary>
         private void DataGridCell_Drop(object sender, DragEventArgs e)
         {
+            DataGridCell_DragLeave(sender, e); // Clear the hover highlight
             DataGridCell cell = sender as DataGridCell;
             ParEntry parEntry = (ParEntry)cell.DataContext;
             if (parEntry != null)
