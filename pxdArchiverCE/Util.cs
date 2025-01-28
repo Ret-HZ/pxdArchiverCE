@@ -4,11 +4,22 @@ using System.Runtime.InteropServices;
 using System.Windows.Media;
 using System.Windows;
 using Yarhl.FileSystem;
+using System.Reflection;
 
 namespace pxdArchiverCE
 {
     internal static class Util
     {
+        /// <summary>
+        /// Gets the product name of the application according to the <see cref="AssemblyProductAttribute"/>.
+        /// </summary>
+        /// <returns>The product name.</returns>
+        public static string GetAssemblyProductName()
+        {
+            return Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault().Product;
+        }
+
+
         /// <summary>
         /// Gets the directory a node is in. Will ignore dot "." directories.
         /// </summary>

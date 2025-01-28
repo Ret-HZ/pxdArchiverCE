@@ -71,6 +71,7 @@ namespace pxdArchiverCE
         {
             Settings.Init();
             InitializeComponent();
+            this.Title = Util.GetAssemblyProductName();
         }
 
 
@@ -113,6 +114,7 @@ namespace pxdArchiverCE
 
                 OpenDirectory(PXDArchive);
                 PopulateTreeView(PXDArchive);
+                this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
             }
             catch (Exception ex)
             {
