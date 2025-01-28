@@ -35,8 +35,8 @@
             <MenuItem Header="Edit">
                 
             </MenuItem>
-            <MenuItem Header="View">
-                
+            <MenuItem Header="View" Visibility="Collapsed">
+                <!-- TO BE IMPLEMENTED -->
             </MenuItem>
             <MenuItem Header="Settings">
                 <MenuItem x:Name="mi_Settings_CopyParToTempLocation" Header="Copy PARC to temp directory" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_CopyParToTempLocation_Click"
