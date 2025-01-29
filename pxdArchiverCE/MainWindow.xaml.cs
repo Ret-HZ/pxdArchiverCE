@@ -499,19 +499,6 @@ namespace pxdArchiverCE
 
 
         /// <summary>
-        /// Update the file date from the <see cref="ParEntry"/> with the specified <see cref="DateTime"/>.
-        /// </summary>
-        /// <param name="parEntry">The ParEntry.</param>
-        /// <param name="date">The date to set.</param>
-        private static void SetParEntryDate(ParEntry parEntry, DateTime date)
-        {
-            if (parEntry.Node.IsContainer) return;
-            ParFile parFile = parEntry.Node.GetFormatAs<ParFile>();
-            parFile.FileDate = date;
-        }
-
-
-        /// <summary>
         /// Checks if the destination node is a container and, if it is, transfers the dragged files/directories to it.
         /// </summary>
         /// <param name="dragEventArgs"></param>
@@ -790,6 +777,83 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Edit (touch > Reset time) MenuItem. Will reset the file date of every selected file or the whole directory if no selection is made.
+        /// </summary>
+        private void mi_Edit_Touch_ResetTime_Click(object sender, RoutedEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            List<ParEntry> selectedEntries = GetSelectedParEntries();
+            // Prioritize selected files/folders. If there are none, apply to every element in the current directory
+            if (selectedEntries.Count <= 0)
+            {
+                selectedEntries = (List<ParEntry>)datagrid_ParContents.ItemsSource;
+            }
+            foreach (ParEntry entry in selectedEntries)
+            {
+                TouchUtils.ResetTime(entry.Node);
+            }
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
+        }
+
+
+        /// <summary>
+        /// Click event for the Edit (touch > Current time) MenuItem. Will set the current time as the file date of every selected file or the whole directory if no selection is made.
+        /// </summary>
+        private void mi_Edit_Touch_CurrentTime_Click(object sender, RoutedEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            List<ParEntry> selectedEntries = GetSelectedParEntries();
+            // Prioritize selected files/folders. If there are none, apply to every element in the current directory
+            if (selectedEntries.Count <= 0)
+            {
+                selectedEntries = (List<ParEntry>)datagrid_ParContents.ItemsSource;
+            }
+            foreach (ParEntry entry in selectedEntries)
+            {
+                TouchUtils.SetCurrentTime(entry.Node);
+            }
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
+        }
+
+
+        /// <summary>
+        /// Click event for the Edit (touch > Set time) MenuItem. Will set the chosen time as the file date of every selected file or the whole directory if no selection is made.
+        /// </summary>
+        private void mi_Edit_Touch_SetTime_Click(object sender, RoutedEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            List<ParEntry> selectedEntries = GetSelectedParEntries();
+            bool isBulk = false;
+            DateTime bulkDate = DateTime.Now;
+            // Prioritize selected files/folders. If there are none, apply to every element in the current directory
+            if (selectedEntries.Count <= 0)
+            {
+                selectedEntries = (List<ParEntry>)datagrid_ParContents.ItemsSource;
+            }
+            foreach (ParEntry parEntry in selectedEntries)
+            {
+                if (isBulk)
+                {
+                    TouchUtils.SetTime(parEntry.Node, bulkDate);
+                    continue;
+                }
+                TouchSetTimeDialog touchSetTimeDialog = new TouchSetTimeDialog(parEntry.Name, parEntry.Time);
+                if (touchSetTimeDialog.ShowDialog() == true)
+                {
+                    if (touchSetTimeDialog.IsIgnore) continue;
+                    TouchUtils.SetTime(parEntry.Node, touchSetTimeDialog.NewDate);
+                    isBulk = touchSetTimeDialog.IsBulk;
+                    bulkDate = touchSetTimeDialog.NewDate;
+                }
+            }
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
+        }
+
+
+        /// <summary>
         /// Load event for the Settings MenuItems. Will set the IsChecked property accordingly.
         /// </summary>
         private void mi_Settings_Loaded(object sender, RoutedEventArgs e)
@@ -940,14 +1004,13 @@ namespace pxdArchiverCE
         private void datagrid_ParContents_ContextMenu_mi_Touch_ResetTime_Click(object sender, RoutedEventArgs e)
         {
             List<ParEntry> parEntries = GetSelectedParEntries();
-            DateTime resetTime = new DateTime(1970, 1, 1);
 
             foreach (ParEntry parEntry in parEntries)
             {
-                SetParEntryDate(parEntry, resetTime);
+                TouchUtils.ResetTime(parEntry.Node);
             }
-            // Reload directory with changes
-            PopulateDataGrid(NavigationHistoryCurrent);
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
         }
 
 
@@ -957,14 +1020,13 @@ namespace pxdArchiverCE
         private void datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click(object sender, RoutedEventArgs e)
         {
             List<ParEntry> parEntries = GetSelectedParEntries();
-            DateTime currentTime = DateTime.Now;
 
             foreach (ParEntry parEntry in parEntries)
             {
-                SetParEntryDate(parEntry, currentTime);
+                TouchUtils.SetCurrentTime(parEntry.Node);
             }
-            // Reload directory with changes
-            PopulateDataGrid(NavigationHistoryCurrent);
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
         }
 
 
@@ -979,23 +1041,22 @@ namespace pxdArchiverCE
 
             foreach (ParEntry parEntry in parEntries)
             {
-                if (parEntry.Node.IsContainer) continue;
                 if (isBulk)
                 {
-                    SetParEntryDate(parEntry, bulkDate);
+                    TouchUtils.SetTime(parEntry.Node, bulkDate);
                     continue;
                 }
                 TouchSetTimeDialog touchSetTimeDialog = new TouchSetTimeDialog(parEntry.Name, parEntry.Time);
                 if (touchSetTimeDialog.ShowDialog() == true)
                 {
                     if (touchSetTimeDialog.IsIgnore) continue;
-                    SetParEntryDate(parEntry, touchSetTimeDialog.NewDate);
+                    TouchUtils.SetTime(parEntry.Node, touchSetTimeDialog.NewDate);
                     isBulk = touchSetTimeDialog.IsBulk;
                     bulkDate = touchSetTimeDialog.NewDate;
                 }
             }
-            // Reload directory with changes
-            PopulateDataGrid(NavigationHistoryCurrent);
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
         }
 
 

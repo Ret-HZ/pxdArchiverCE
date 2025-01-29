@@ -33,7 +33,11 @@
                 <MenuItem Header="Save as..." Click="FileSaveAs_Click"/>
             </MenuItem>
             <MenuItem Header="Edit">
-                
+                <MenuItem x:Name="mi_Edit_Touch" Header="touch">
+                    <MenuItem x:Name="mi_Edit_Touch_ResetTime" Header="Reset time" Click="mi_Edit_Touch_ResetTime_Click"/>
+                    <MenuItem x:Name="mi_Edit_Touch_CurrentTime" Header="Current time" Click="mi_Edit_Touch_CurrentTime_Click"/>
+                    <MenuItem x:Name="mi_Edit_Touch_SetTime" Header="Set time" Click="mi_Edit_Touch_SetTime_Click"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="View" Visibility="Collapsed">
                 <!-- TO BE IMPLEMENTED -->
