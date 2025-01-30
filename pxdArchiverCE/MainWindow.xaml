@@ -6,7 +6,7 @@
         xmlns:pxd="clr-namespace:pxdArchiverCE.Controls"
         xmlns:local="clr-namespace:pxdArchiverCE"
         mc:Ignorable="d"
-        Title="PXD Archiver Community Edition" Height="650" Width="1200" Closing="Window_Closing">
+        Title="PXD Archiver Community Edition" Height="800" Width="1400" Closing="Window_Closing">
 
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
