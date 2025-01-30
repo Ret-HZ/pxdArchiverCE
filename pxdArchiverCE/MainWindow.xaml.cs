@@ -580,6 +580,42 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Prompts the user for confirmation and, if allowed, will delete the selected elements.
+        /// </summary>
+        private void DeleteSelected()
+        {
+            if (PXDArchive == null) return;
+            List<ParEntry> selectedItems = GetSelectedParEntries();
+            if (selectedItems.Count > 0)
+            {
+                MessageBoxResult result = MessageBox.Show(this, $"{selectedItems.Count} elements and their contents will be deleted.\nAre you sure you want to proceed?", "Confirm deletion", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    foreach (ParEntry parEntry in selectedItems)
+                    {
+                        parEntry.Node.Parent.Remove(parEntry.Node);
+                        parEntry.Node.Dispose();
+                    }
+                    RefreshCurrentDirectory();
+                    PopulateTreeView(PXDArchive);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Window (app) preview key down event. Will execute keybind commands without interference from the datagrid.
+        /// </summary>
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                DeleteSelected();
+            }
+        }
+
+
+        /// <summary>
         /// Window (app) closing event. Will clean up any temp fileDescriptors.
         /// </summary>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -1088,6 +1124,15 @@ namespace pxdArchiverCE
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Delete). Will trigger the prompt to delete selected items.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteSelected();
         }
 
 

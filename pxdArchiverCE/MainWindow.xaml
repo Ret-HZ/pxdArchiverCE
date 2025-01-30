@@ -6,7 +6,7 @@
         xmlns:pxd="clr-namespace:pxdArchiverCE.Controls"
         xmlns:local="clr-namespace:pxdArchiverCE"
         mc:Ignorable="d"
-        Title="PXD Archiver Community Edition" Height="800" Width="1400" Closing="Window_Closing">
+        Title="PXD Archiver Community Edition" Height="800" Width="1400" PreviewKeyDown="Window_PreviewKeyDown" Closing="Window_Closing">
 
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
@@ -164,6 +164,8 @@
                                 <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime" Header="Current time" Click="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click"/>
                                 <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_SetTime" Header="Set time" Click="datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click"/>
                             </MenuItem>
+                            <Separator/>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Delete" Header="Delete" Click="datagrid_ParContents_ContextMenu_mi_Delete_Click"/>
                         </ContextMenu>
                         <Style x:Key="Selectable" TargetType="{x:Type DataGridCell}">
                             <Setter Property="BorderThickness" Value="0"/>
