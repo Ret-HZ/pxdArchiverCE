@@ -130,6 +130,7 @@ namespace pxdArchiverCE
                 NavigationHistoryPrevious.Clear();
                 NavigationHistoryNext.Clear();
                 NavigationHistoryCurrent = null;
+                this.Title = $"{Util.GetAssemblyProductName()}";
             }
         }
 
