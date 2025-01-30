@@ -164,6 +164,7 @@
                                 <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime" Header="Current time" Click="datagrid_ParContents_ContextMenu_mi_Touch_CurrentTime_Click"/>
                                 <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Touch_SetTime" Header="Set time" Click="datagrid_ParContents_ContextMenu_mi_Touch_SetTime_Click"/>
                             </MenuItem>
+                            <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Rename" Header="Rename" Click="datagrid_ParContents_ContextMenu_mi_Rename_Click"/>
                             <Separator/>
                             <MenuItem x:Name="datagrid_ParContents_ContextMenu_mi_Delete" Header="Delete" Click="datagrid_ParContents_ContextMenu_mi_Delete_Click"/>
                         </ContextMenu>

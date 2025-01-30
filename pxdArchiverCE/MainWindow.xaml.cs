@@ -1129,6 +1129,48 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Rename). Will present the user with an input window to rename the selected elements.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Rename_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ParEntry parEntry in GetSelectedParEntries())
+            {
+                TextInputDialog inputDialog = new TextInputDialog("Rename element", parEntry.Name);
+                inputDialog.ShowDialog();
+                if (!inputDialog.IsCancelled)
+                {
+                    string chosenName = inputDialog.Input;
+                    string chosenNameExtension = Path.GetExtension(chosenName);
+                    chosenName = string.Concat(chosenName.Take(50)); // Ensure the string is under 50 characters long. (Real maximum is 60)
+                    List<string> existingNames = new List<string>();
+                    foreach (Node node in parEntry.Node.Parent.Children)
+                    {
+                        if (node.Name == parEntry.Name) continue;
+                        existingNames.Add(node.Name);
+                    }
+                    bool isUniqueName = false;
+                    if (!existingNames.Contains(chosenName)) isUniqueName = true;
+
+                    int i = 1;
+                    while (!isUniqueName)
+                    {
+                        string newName = $"{Path.GetFileNameWithoutExtension(chosenName)} ({i++}){chosenNameExtension}";
+                        if (!existingNames.Contains(newName))
+                        {
+                            chosenName = newName;
+                            isUniqueName = true;
+                        }
+                    }
+                    parEntry.Node.Name = chosenName;
+                }
+            }
+            // Refresh directory to reflect changes
+            RefreshCurrentDirectory();
+            PopulateTreeView(PXDArchive);
+        }
+
+
+        /// <summary>
         /// Click event for the DataGrid's ContextMenu MenuItem (Delete). Will trigger the prompt to delete selected items.
         /// </summary>
         private void datagrid_ParContents_ContextMenu_mi_Delete_Click(object sender, RoutedEventArgs e)
