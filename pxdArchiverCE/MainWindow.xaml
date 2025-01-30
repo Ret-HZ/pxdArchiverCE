@@ -130,7 +130,7 @@
             <Grid Grid.Column="1" x:Name="grid_ParContentsParent">
                 <pxd:PxdDataGrid x:Name="datagrid_ParContents" Background="White" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
                        IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      CanUserResizeRows="False" CanUserReorderColumns="False" SelectionMode="Extended" MouseLeftButtonDown="datagrid_ParContents_MouseLeftButtonDown" MouseLeftButtonUp="datagrid_ParContents_MouseLeftButtonUp" 
+                      CanUserResizeRows="False" CanUserReorderColumns="False" SelectionMode="Extended" AllowDrop="True" Drop="datagrid_ParContents_Drop" MouseLeftButtonDown="datagrid_ParContents_MouseLeftButtonDown" MouseLeftButtonUp="datagrid_ParContents_MouseLeftButtonUp" 
                       MouseMove="datagrid_ParContents_MouseMove" Loaded="datagrid_ParContents_Loaded">
                     <DataGrid.Resources>
                         <Style TargetType="{x:Type DataGridCell}">

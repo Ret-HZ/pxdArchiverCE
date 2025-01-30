@@ -522,36 +522,39 @@ namespace pxdArchiverCE
         /// </summary>
         /// <param name="dragEventArgs"></param>
         /// <param name="destinationNode">The <see cref="Node"/> that will contain the dragged files.</param>
-        private void FileDropEventOnFolder(DragEventArgs dragEventArgs, Node destinationNode)
+        private void FileDropEventOnFolder(DragEventArgs dragEventArgs, Node destinationNode, bool externalDragOnly = false)
         {
             if (!destinationNode.IsContainer) return;
 
-            // Check for node path text in case it is an internal drag operation.
-            try
+            if (!externalDragOnly)
             {
-                string nodePathsString = (string)dragEventArgs.Data.GetData(DataFormats.Text);
-                if (nodePathsString != null && nodePathsString.Length > 0)
+                try
                 {
-                    string[] lines = nodePathsString.TrimEnd().Split(new string[] { "\n" }, StringSplitOptions.None);
-                    foreach (string line in lines)
+                    string nodePathsString = (string)dragEventArgs.Data.GetData(DataFormats.Text);
+                    if (nodePathsString != null && nodePathsString.Length > 0)
                     {
-                        if (!line.StartsWith("node://")) continue;
-                        string nodePath = line.Replace("node://", "");
-                        Node node = Navigator.SearchNode(PXDArchive, nodePath);
-                        if (node != null && node != destinationNode)
+                        string[] lines = nodePathsString.TrimEnd().Split(new string[] { "\n" }, StringSplitOptions.None);
+                        foreach (string line in lines)
                         {
-                            destinationNode.Add(node);
+                            if (!line.StartsWith("node://")) continue;
+                            string nodePath = line.Replace("node://", "");
+                            Node node = Navigator.SearchNode(PXDArchive, nodePath);
+                            if (node != null && node != destinationNode)
+                            {
+                                destinationNode.Add(node);
+                            }
                         }
+                        RefreshCurrentDirectory();
+                        PopulateTreeView(PXDArchive);
+                        return;
                     }
-                    RefreshCurrentDirectory();
-                    PopulateTreeView(PXDArchive);
-                    return;
+                }
+                catch (Exception ex)
+                {
+
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
+            // Check for node path text in case it is an internal drag operation.
 
             // Check for file in case it is an external drag operation.
             string[] files = (string[])dragEventArgs.Data.GetData(DataFormats.FileDrop);
@@ -1088,6 +1091,16 @@ namespace pxdArchiverCE
         }
 
 
+        /// <summary>
+        /// Drop event for the <see cref="DataGrid"/>. Will add or move files to the currently opened directory node.
+        /// </summary>
+        private void datagrid_ParContents_Drop(object sender, DragEventArgs e)
+        {
+            if (PXDArchive == null) return;
+            FileDropEventOnFolder(e, NavigationHistoryCurrent, true);
+        }
+
+
         #region ItemSelection
 
         /// <summary>
@@ -1489,6 +1502,8 @@ namespace pxdArchiverCE
             {
                 FileDropEventOnFolder(e, parEntry.Node);
             }
+            // Prevent it from triggering the datagrid's drop event.
+            e.Handled = true;
         }
 
 
