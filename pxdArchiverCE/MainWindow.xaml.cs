@@ -144,13 +144,32 @@ namespace pxdArchiverCE
             {
                 var writerParameters = new ParArchiveWriterParameters
                 {
-                    CompressorVersion = 0x1,
+                    CompressorVersion = 0x0,
                     OutputPath = path,
-                    IncludeDots = !Settings.LegacyMode,
+                    IncludeDots = false,
                 };
 
                 // Deep clone the node and write the clone so the file handle remains the same.
-                Node temp = new Node(PXDArchive);
+                Node temp = NodeUtils.CloneDirectory(PXDArchive);
+                // Rename the root directory accordingly
+                if (temp.Children.Count == 1)
+                {
+                    Node rootDirectory = temp.Children[0];
+                    if (Settings.LegacyMode)
+                    {
+                        if (rootDirectory.Name == ".")
+                        {
+                            rootDirectory.Name = PXDArchive.Name.Replace(".par", "");
+                        }
+                    }
+                    else
+                    {
+                        if (rootDirectory.Name != ".")
+                        {
+                            rootDirectory.Name = ".";
+                        }
+                    }
+                }
                 File.Delete(path);
                 temp.TransformWith(new ParArchiveWriter(writerParameters));
                 temp.Dispose();
@@ -1376,14 +1395,8 @@ namespace pxdArchiverCE
                         });
                     }
 
-                    //Yarhl's deep clone does not properly clone formats and attributes so they need to be set manually
-                    Node nodeTemp = new Node(node).TransformWith(new ParFile());
+                    Node nodeTemp = NodeUtils.CloneFile(node);
                     var parFile = nodeTemp.GetFormatAs<ParFile>();
-                    parFile.CanBeCompressed = originalParFile.CanBeCompressed;
-                    parFile.IsCompressed = originalParFile.IsCompressed;
-                    parFile.DecompressedSize = originalParFile.DecompressedSize;
-                    parFile.Attributes = originalParFile.Attributes;
-                    parFile.FileDate = originalParFile.FileDate;
 
                     if (parFile.IsCompressed)
                     {

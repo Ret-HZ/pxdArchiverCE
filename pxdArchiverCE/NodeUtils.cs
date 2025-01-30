@@ -64,5 +64,66 @@ namespace pxdArchiverCE
 
             return container;
         }
+
+
+        /// <summary>
+        /// Creates a deep copy of the chosen directory <see cref="Node"/>, ensuring the properties are kept identical to the original.
+        /// </summary>
+        /// <param name="original">The original node.</param>
+        /// <returns>A copy of the node.</returns>
+        internal static Node CloneDirectory(Node original)
+        {
+            Node copy = new Node(original);
+            foreach (Node childOriginal in Navigator.IterateNodes(original))
+            {
+                Node childCopy = Navigator.SearchNode(copy, childOriginal.Path);
+                if (childOriginal.IsContainer)
+                {
+                    childCopy.Tags["FirstFolderIndex"] = childOriginal.Tags["FirstFolderIndex"];
+                    childCopy.Tags["FolderCount"] = childOriginal.Tags["FolderCount"];
+                    childCopy.Tags["FirstFileIndex"] = childOriginal.Tags["FirstFileIndex"];
+                    childCopy.Tags["FileCount"] = childOriginal.Tags["FileCount"];
+                    childCopy.Tags["Attributes"] = childOriginal.Tags["Attributes"];
+                    childCopy.Tags["Unused1"] = childOriginal.Tags["Attributes"];
+                    childCopy.Tags["Unused2"] = childOriginal.Tags["Attributes"];
+                    childCopy.Tags["Unused3"] = childOriginal.Tags["Attributes"];
+                }
+                else
+                {
+                    ParFile parFileOriginal = childOriginal.GetFormatAs<ParFile>();
+                    ParFile parFileCopy = childCopy.TransformWith(new ParFile()).GetFormatAs<ParFile>();
+
+                    parFileCopy.CanBeCompressed = parFileOriginal.CanBeCompressed;
+                    parFileCopy.IsCompressed = parFileOriginal.IsCompressed;
+                    parFileCopy.DecompressedSize = parFileOriginal.DecompressedSize;
+                    parFileCopy.Attributes = parFileOriginal.Attributes;
+                    parFileCopy.FileDate = parFileOriginal.FileDate;
+                    parFileCopy.Timestamp = parFileOriginal.Timestamp;
+                }
+            }
+            return copy;
+        }
+
+
+        /// <summary>
+        /// Creates a deep copy of the chosen file <see cref="Node"/>, ensuring the properties are kept identical to the original.
+        /// </summary>
+        /// <param name="original">The original node.</param>
+        /// <returns>A copy of the node.</returns>
+        internal static Node CloneFile(Node original)
+        {
+            Node copy = new Node(original);
+            ParFile parFileOriginal = original.GetFormatAs<ParFile>();
+            ParFile parFileCopy = copy.TransformWith(new ParFile()).GetFormatAs<ParFile>();
+
+            parFileCopy.CanBeCompressed = parFileOriginal.CanBeCompressed;
+            parFileCopy.IsCompressed = parFileOriginal.IsCompressed;
+            parFileCopy.DecompressedSize = parFileOriginal.DecompressedSize;
+            parFileCopy.Attributes = parFileOriginal.Attributes;
+            parFileCopy.FileDate = parFileOriginal.FileDate;
+            parFileCopy.Timestamp = parFileOriginal.Timestamp;
+
+            return copy;
+        }
     }
 }
