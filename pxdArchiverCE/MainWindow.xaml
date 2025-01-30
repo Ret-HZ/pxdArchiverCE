@@ -67,7 +67,7 @@
                     <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Open" Click="FileOpen_Click">
-                    <Image Source="/Resources/Images/FolderOpen.png" Width="16" Height="16"/>
+                    <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Save" Click="FileSave_Click">
                     <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
@@ -107,7 +107,7 @@
                         </Style>
                         <HierarchicalDataTemplate DataType="{x:Type local:ParDirectory}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
-                                <Image x:Name="treeviewitem_FolderIcon" Source="/Resources/Images/FolderClosed.png" Margin="0,0,5,0"/>
+                                <Image x:Name="treeviewitem_FolderIcon" Source="/Resources/Images/FolderClosed.png" Margin="0,0,5,0" Width="16" Height="16"/>
                                 <TextBlock Text="{Binding Name}"/>
                             </StackPanel>
                             <HierarchicalDataTemplate.Triggers>

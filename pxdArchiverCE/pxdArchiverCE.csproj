@@ -57,6 +57,7 @@
     <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_64.png" />
     <Resource Include="Resources\Images\File.png" />
     <Resource Include="Resources\Images\FolderClosed.png" />
+    <Resource Include="Resources\Images\Folder.png" />
     <Resource Include="Resources\Images\FolderOpen.png" />
     <Resource Include="Resources\Images\Next.png" />
     <Resource Include="Resources\Images\OneLevelUp.png" />
