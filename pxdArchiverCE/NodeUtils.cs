@@ -79,14 +79,7 @@ namespace pxdArchiverCE
                 Node childCopy = Navigator.SearchNode(copy, childOriginal.Path);
                 if (childOriginal.IsContainer)
                 {
-                    childCopy.Tags["FirstFolderIndex"] = childOriginal.Tags["FirstFolderIndex"];
-                    childCopy.Tags["FolderCount"] = childOriginal.Tags["FolderCount"];
-                    childCopy.Tags["FirstFileIndex"] = childOriginal.Tags["FirstFileIndex"];
-                    childCopy.Tags["FileCount"] = childOriginal.Tags["FileCount"];
-                    childCopy.Tags["Attributes"] = childOriginal.Tags["Attributes"];
-                    childCopy.Tags["Unused1"] = childOriginal.Tags["Attributes"];
-                    childCopy.Tags["Unused2"] = childOriginal.Tags["Attributes"];
-                    childCopy.Tags["Unused3"] = childOriginal.Tags["Attributes"];
+                    continue;
                 }
                 else
                 {
