@@ -65,32 +65,39 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray Grid.Row="1">
-            <ToolBar ToolTip="General" Loaded="ToolBar_Loaded">
-                <Button ToolTip="New">
-                    <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
-                </Button>
-                <Button ToolTip="Open" Click="FileOpen_Click">
-                    <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
-                </Button>
-                <Button ToolTip="Save" Click="FileSave_Click">
-                    <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
-                </Button>
-                <Separator/>
-            </ToolBar>
-            <ToolBar ToolTip="Navigation" Loaded="ToolBar_Loaded">
-                <Button x:Name="btn_Navigation_Previous" ToolTip="Previous" IsEnabled="False" Click="btn_Navigation_Previous_Click">
-                    <Image Source="/Resources/Images/Previous.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button x:Name="btn_Navigation_Next" ToolTip="Next" IsEnabled="False" Click="btn_Navigation_Next_Click">
-                    <Image Source="/Resources/Images/Next.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button x:Name="btn_Navigation_DirectoryUp" ToolTip="Directory Up" IsEnabled="False" Click="btn_Navigation_DirectoryUp_Click">
-                    <Image Source="/Resources/Images/OneLevelUp.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.75*"/>
+            </Grid.ColumnDefinitions>
 
+            <ToolBarTray Grid.Column="0" HorizontalAlignment="Stretch" IsLocked="True">
+                <ToolBar ToolTip="General" Loaded="ToolBar_Loaded">
+                    <Button ToolTip="New">
+                        <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
+                    </Button>
+                    <Button ToolTip="Open" Click="FileOpen_Click">
+                        <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
+                    </Button>
+                    <Button ToolTip="Save" Click="FileSave_Click">
+                        <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+            <ToolBarTray Grid.Column="1" HorizontalAlignment="Stretch" IsLocked="True">
+                <ToolBar ToolTip="Navigation" Loaded="ToolBar_Loaded">
+                    <Button x:Name="btn_Navigation_Previous" ToolTip="Previous" IsEnabled="False" Click="btn_Navigation_Previous_Click">
+                        <Image Source="/Resources/Images/Previous.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </Button>
+                    <Button x:Name="btn_Navigation_Next" ToolTip="Next" IsEnabled="False" Click="btn_Navigation_Next_Click">
+                        <Image Source="/Resources/Images/Next.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </Button>
+                    <Button x:Name="btn_Navigation_DirectoryUp" ToolTip="Directory Up" IsEnabled="False" Click="btn_Navigation_DirectoryUp_Click">
+                        <Image Source="/Resources/Images/OneLevelUp.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </Grid>
 
 
         <Grid Grid.Row="2">
