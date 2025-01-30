@@ -1,8 +1,7 @@
 ﻿<Application x:Class="pxdArchiverCE.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:pxdArchiverCE"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:pxdArchiverCE">
     <Application.Resources>
          
     </Application.Resources>

@@ -79,7 +79,7 @@ namespace pxdArchiverCE
         /// Opens a PARC archive from a file.
         /// </summary>
         /// <param name="path">The path to the PARC file.</param>
-        private void OpenPAR(string path)
+        internal void OpenPAR(string path)
         {
             try
             {
