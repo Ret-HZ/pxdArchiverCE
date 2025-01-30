@@ -51,6 +51,10 @@
                     <MenuItem x:Name="mi_Settings_SizeDisplayUnitAuto" Header="Automatic" IsCheckable="True" Tag="AUTO" Loaded="mi_Settings_Loaded" Click="mi_Settings_SizeDisplayUnit_Click"/>
                     <MenuItem x:Name="mi_Settings_SizeDisplayUnitBytes" Header="Bytes" IsCheckable="True" Tag="BYTES" Loaded="mi_Settings_Loaded" Click="mi_Settings_SizeDisplayUnit_Click"/>
                 </MenuItem>
+                <Separator/>
+                <MenuItem Header="Advanced">
+                    <MenuItem x:Name="mi_Settings_Advanced_OpenWorkDir" Header="Open work directory" IsCheckable="False" Click="mi_Settings_Advanced_OpenWorkDir_Click"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem x:Name="mi_Help_About" Header="About pxdArchiverCE" Click="mi_Help_About_Click">

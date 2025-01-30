@@ -935,6 +935,15 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Settings (Advanced > Open work directory) MenuItem. Will open the app's AppData folder.
+        /// </summary>
+        private void mi_Settings_Advanced_OpenWorkDir_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", Settings.PATH_APPDATA);
+        }
+
+
+        /// <summary>
         /// Click event for the Help (About pxdArchiverCE) MenuItem. Will open the About window.
         /// </summary>
         private void mi_Help_About_Click(object sender, RoutedEventArgs e)
