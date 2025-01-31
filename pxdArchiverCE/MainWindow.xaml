@@ -27,7 +27,7 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="New"/>
+                <MenuItem Header="New" Click="FileNew_Click"/>
                 <MenuItem Header="Open" Click="FileOpen_Click"/>
                 <MenuItem Header="Save" Click="FileSave_Click"/>
                 <MenuItem Header="Save as..." Click="FileSaveAs_Click"/>
@@ -76,7 +76,7 @@
 
             <ToolBarTray Grid.Column="0" HorizontalAlignment="Stretch" IsLocked="True">
                 <ToolBar ToolTip="General" Loaded="ToolBar_Loaded">
-                    <Button ToolTip="New">
+                    <Button ToolTip="New" Click="FileNew_Click" >
                         <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
                     </Button>
                     <Button ToolTip="Open" Click="FileOpen_Click">

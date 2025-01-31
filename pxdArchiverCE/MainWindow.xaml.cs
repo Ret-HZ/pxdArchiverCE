@@ -628,6 +628,38 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the File New menu or toolbar items.
+        /// </summary>
+        private void FileNew_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show(this, $"Would you like to create a new PARC file?{((PXDArchive == null) ? "" : "\nAny unsaved changes to the currently opened file will be lost.")}",
+                "New PARC creation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                if (PXDArchive != null)
+                {
+                    PXDArchive.Dispose();
+                }
+
+                string newParName = "new.par";
+                Node newPar = new Node(newParName, new NodeContainerFormat());
+                Node rootDirectory = new Node(".", new NodeContainerFormat());
+                newPar.Add(rootDirectory);
+                PXDArchive = newPar;
+                PXDArchivePath = newParName;
+
+                NavigationHistoryPrevious.Clear();
+                NavigationHistoryNext.Clear();
+                NavigationHistoryCurrent = null;
+
+                OpenDirectory(PXDArchive);
+                PopulateTreeView(PXDArchive);
+                this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
+            }
+        }
+
+
+        /// <summary>
         /// Click event for the File Open menu or toolbar items.
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
