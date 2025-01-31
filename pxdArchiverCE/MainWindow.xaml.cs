@@ -72,6 +72,7 @@ namespace pxdArchiverCE
             Settings.Init();
             InitializeComponent();
             this.Title = Util.GetAssemblyProductName();
+            mi_Settings_Advanced_Session.Header = $"Session: {Settings.SESSION_GUID}";
         }
 
 
@@ -980,6 +981,15 @@ namespace pxdArchiverCE
         private void mi_Settings_Advanced_OpenWorkDir_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("explorer.exe", Settings.PATH_APPDATA);
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (Advanced > Open session directory) MenuItem. Will open the current session's AppData folder.
+        /// </summary>
+        private void mi_Settings_Advanced_OpenSessionDir_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", Settings.PATH_APPDATA_SESSION);
         }
 
 

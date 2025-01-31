@@ -54,6 +54,9 @@
                 <Separator/>
                 <MenuItem Header="Advanced">
                     <MenuItem x:Name="mi_Settings_Advanced_OpenWorkDir" Header="Open work directory" IsCheckable="False" Click="mi_Settings_Advanced_OpenWorkDir_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="mi_Settings_Advanced_Session" Header="Session: [ID]" IsCheckable="False" IsEnabled="False"/>
+                    <MenuItem x:Name="mi_Settings_Advanced_OpenSessionDir" Header="Open session directory" IsCheckable="False" Click="mi_Settings_Advanced_OpenSessionDir_Click"/>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Help">
