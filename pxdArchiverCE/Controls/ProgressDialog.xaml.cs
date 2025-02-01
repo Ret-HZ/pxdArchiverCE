@@ -12,6 +12,8 @@ namespace pxdArchiverCE.Controls
         /// </summary>
         public bool IsCancelledByUser { get; private set; }
 
+        public bool AllowClosing { get; set; }
+
 
         public ProgressDialog(string windowTitle = "", string text = "", string description = "")
         {
@@ -19,6 +21,7 @@ namespace pxdArchiverCE.Controls
             SetTitle(windowTitle);
             SetText(text);
             SetDescription(description);
+            IsCancelledByUser = false;
         }
 
 
@@ -71,6 +74,10 @@ namespace pxdArchiverCE.Controls
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (AllowClosing)
+            {
+                return;
+            }
             if (IsCancelledByUser)
             {
                 return;

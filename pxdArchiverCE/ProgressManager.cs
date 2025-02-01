@@ -62,6 +62,7 @@ namespace pxdArchiverCE
 
                 if (LastReportedProgress == MaximumProgress)
                 {
+                    ProgressDialog.AllowClosing = true;
                     ProgressDialog.Close();
                 }
             }
