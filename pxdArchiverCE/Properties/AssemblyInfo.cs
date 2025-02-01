@@ -17,7 +17,7 @@ using System.Windows;
 // associated with an assembly.
 [assembly: AssemblyProduct("PXD Archiver Community Edition")]
 [assembly: AssemblyTitle("PXD Archive (PARC) File Manager")]
-[assembly: AssemblyCopyright("Copyright © 2024  Christopher Holzmann Pérez")]
+[assembly: AssemblyCopyright("Copyright © 2025  Christopher Holzmann Pérez")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -34,4 +34,4 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyVersion("1.0.0")]
