@@ -92,7 +92,7 @@ namespace pxdArchiverCE
 
                 var parameters = new ParArchiveReaderParameters
                 {
-                    Recursive = false
+                    Recursive = Settings.HandleNestedPar
                 };
 
                 string parPath = path;
@@ -952,6 +952,7 @@ namespace pxdArchiverCE
         {
             mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
+            mi_Settings_HandleNestedPar.IsChecked = Settings.HandleNestedPar;
             mi_Settings_SizeDisplayUnitAuto.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.AUTO;
             mi_Settings_SizeDisplayUnitBytes.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.BYTES;
         }
@@ -975,6 +976,17 @@ namespace pxdArchiverCE
         {
             Settings.LegacyMode = !Settings.LegacyMode;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
+            Settings.SaveSettings();
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (HandleNestedPar) MenuItem. Will toggle the HandleNestedPar setting.
+        /// </summary>
+        private void mi_Settings_HandleNestedPar_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.HandleNestedPar = !Settings.HandleNestedPar;
+            mi_Settings_HandleNestedPar.IsChecked = Settings.HandleNestedPar;
             Settings.SaveSettings();
         }
 

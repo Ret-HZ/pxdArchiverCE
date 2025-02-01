@@ -19,6 +19,7 @@ namespace pxdArchiverCE
         internal static int IniVersion = 1;
         internal static bool CopyParToTempLocation = true;
         internal static bool LegacyMode = false;
+        internal static bool HandleNestedPar = false;
         internal static SizeDisplayUnit SizeDisplayUnit = SizeDisplayUnit.AUTO;
 
 
@@ -45,6 +46,7 @@ namespace pxdArchiverCE
             IniVersion = int.Parse(settings["GENERAL"]["IniVersion"]);
             CopyParToTempLocation = bool.Parse(settings["PARC"]["CopyParToTempLocation"]);
             LegacyMode = bool.Parse(settings["PARC"]["LegacyMode"]);
+            HandleNestedPar = bool.Parse(settings["PARC"]["HandleNestedPar"]);
             SizeDisplayUnit = (SizeDisplayUnit)int.Parse(settings["GUI"]["SizeDisplayUnit"]);
         }
 
@@ -67,6 +69,7 @@ namespace pxdArchiverCE
             IniData settings = iniParser.ReadFile(PATH_APPDATA_SETTINGS);
             settings["PARC"]["CopyParToTempLocation"] = CopyParToTempLocation.ToString().ToLower();
             settings["PARC"]["LegacyMode"] = LegacyMode.ToString().ToLower();
+            settings["PARC"]["HandleNestedPar"] = HandleNestedPar.ToString().ToLower();
             settings["GUI"]["SizeDisplayUnit"] = Convert.ToInt32(SizeDisplayUnit).ToString();
             iniParser.WriteFile(PATH_APPDATA_SETTINGS, settings);
         }
