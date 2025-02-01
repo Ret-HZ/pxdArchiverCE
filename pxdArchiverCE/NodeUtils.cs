@@ -1,5 +1,6 @@
 ﻿using ParLibrary;
 using System.IO;
+using System.Windows;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -63,6 +64,130 @@ namespace pxdArchiverCE
             }
 
             return container;
+        }
+
+
+        /// <summary>
+        /// Count the amount of files inside a list of <see cref="Node"/>s, including their children.
+        /// </summary>
+        /// <param name="nodes">The nodes to count.</param>
+        /// <returns>The total amount of files.</returns>
+        internal static int CountFiles(List<Node> nodes)
+        {
+            int count = 0;
+
+            foreach (Node node in nodes)
+            {
+                if (node.IsContainer)
+                {
+                    count += CountFiles(node);
+                }
+                else
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+
+        /// <summary>
+        /// Count the amount of files inside a  <see cref="Node"/>.
+        /// </summary>
+        /// <param name="nodes">The nodes to count.</param>
+        /// <returns>The total amount of files.</returns>
+        internal static int CountFiles(Node node)
+        {
+            int count = 0;
+
+            if (node.IsContainer)
+            {
+                count += CountFiles(node.Children.ToList());
+            }
+            else
+            {
+                count++;
+            }
+            
+            return count;
+        }
+
+
+        /// <summary>
+        /// Set the chosen compression level on the target <see cref="Node"/>. 0 = None, 1 = Normal, 2 = High
+        /// </summary>
+        /// <param name="node">The node to compress.</param>
+        /// <param name="compression">The compression level.</param>
+        /// <param name="progressManager">The progress manager.</param>
+        internal static void Compress(Node node, byte compression, ProgressManager progressManager)
+        {
+            if (node.IsContainer)
+            {
+                foreach (Node childNode in node.Children)
+                {
+                    Compress(childNode, compression, progressManager);
+                }
+            }
+            else
+            {
+                // Update the progress window UI
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    progressManager.UpdateProgress();
+                    progressManager.SetDescriptionText($"{Path.Combine(Util.GetNodeDirectory(node), node.Name)}");
+                });
+
+                if (progressManager.CheckIsCancelledByUser())
+                {
+                    return;
+                }
+
+                ParFile parFile = node.GetFormatAs<ParFile>();
+                // Ensure the file is decompressed before further actions
+                if (parFile.IsCompressed)
+                {
+                    node.TransformWith<ParLibrary.Sllz.Decompressor>();
+                }
+
+                if (compression == 0x00) return;
+
+                ParLibrary.Sllz.CompressorParameters parameters = new ParLibrary.Sllz.CompressorParameters()
+                {
+                    Version = 0x00,
+                    Endianness = 0x00,
+                };
+
+                if (compression == 0x01)
+                {
+                    parameters.Version = 0x01;
+                }
+                else if (compression == 0x02)
+                {
+                    parameters.Version = 0x02;
+                }
+
+                try
+                {
+                    node.TransformWith(new ParLibrary.Sllz.Compressor(parameters));
+                }
+                catch (Exception ex)
+                {
+                    // Leave uncompressed
+                    parFile = node.GetFormatAs<ParFile>();
+                    if (parFile.IsCompressed)
+                    {
+                        node.TransformWith<ParLibrary.Sllz.Decompressor>();
+                        return;
+                    }
+                }
+
+                // Leave uncompressed if the compressed result ends up being larger
+                parFile = node.GetFormatAs<ParFile>();
+                if (parFile.DecompressedSize < parFile.Stream.Length)
+                {
+                    node.TransformWith<ParLibrary.Sllz.Decompressor>();
+                }
+            }
         }
 
 

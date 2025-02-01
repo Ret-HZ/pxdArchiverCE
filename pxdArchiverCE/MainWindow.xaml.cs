@@ -12,6 +12,7 @@ using Yarhl.IO;
 using pxdArchiverCE.Controls;
 using System.Windows.Input;
 using System.Text;
+using System.Windows.Threading;
 
 namespace pxdArchiverCE
 {
@@ -606,6 +607,49 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Toggles compression on the selected elements.
+        /// </summary>
+        /// <param name="compressionMode">The compression mode. 0 = None, 1 = Normal, 2 = High</param>
+        private void ToggleCompression(byte compressionMode)
+        {
+            List<ParEntry> selectedParEntries = GetSelectedParEntries();
+            if (selectedParEntries.Count <= 0) return;
+            List<Node> nodes = new List<Node>();
+            foreach (ParEntry parEntry in selectedParEntries)
+            {
+                nodes.Add(parEntry.Node);
+            }
+            int totalFiles = NodeUtils.CountFiles(nodes);
+            ProgressManager = new ProgressManager(totalFiles);
+            ProgressManager.PrepareWindowText($"{((compressionMode == 0x00) ? "Decompressing" : "Compressing")}", $"{((compressionMode == 0x00) ? "Decompressing" : "Compressing")} {totalFiles} files");
+            ProgressManager.ShowProgressDialogNonBlocking();
+            this.IsEnabled = false; // Disable the window while the compression runs
+
+            var frame = new DispatcherFrame();
+            List<Task> tasks = new List<Task>();
+
+            foreach (ParEntry parEntry in GetSelectedParEntries())
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    NodeUtils.Compress(parEntry.Node, compressionMode, ProgressManager);
+                }));
+            }
+
+            // Continue only after the compression task finishes
+            Task.WhenAll(tasks).ContinueWith(_ =>
+            {
+                frame.Continue = false;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            Dispatcher.PushFrame(frame);
+
+            this.IsEnabled = true; // Re-enable the window
+            RefreshCurrentDirectory();
+        }
+
+
+        /// <summary>
         /// Window (app) preview key down event. Will execute keybind commands without interference from the datagrid.
         /// </summary>
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -1117,6 +1161,33 @@ namespace pxdArchiverCE
                     }
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Compression > None). Will disable compression for the selected elements.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Compression_None_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleCompression(0x00);
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Compression > Normal). Will compress the selected elements with "Normal" level compression.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Compression_Normal_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleCompression(0x01);
+        }
+
+
+        /// <summary>
+        /// Click event for the DataGrid's ContextMenu MenuItem (Compression > High). Will compress the selected elements with "High" level compression.
+        /// </summary>
+        private void datagrid_ParContents_ContextMenu_mi_Compression_High_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleCompression(0x02);
         }
 
 
