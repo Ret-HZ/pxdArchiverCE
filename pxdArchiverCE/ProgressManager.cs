@@ -76,6 +76,13 @@ namespace pxdArchiverCE
         }
 
 
+        public void ShowProgressDialogNonBlocking()
+        {
+            ProgressDialog = new ProgressDialog(WindowTitle, WindowText, WindowDescription);
+            if (MaximumProgress > 5) ProgressDialog.Show();
+        }
+
+
         public void CloseProgressDialog()
         {
             ProgressDialog.Close();
