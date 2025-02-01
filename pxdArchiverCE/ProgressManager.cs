@@ -69,6 +69,12 @@ namespace pxdArchiverCE
         }
 
 
+        public int GetProgress()
+        {
+            return LastReportedProgress;
+        }
+
+
         public void ShowProgressDialog()
         {
             ProgressDialog = new ProgressDialog(WindowTitle, WindowText, WindowDescription);
