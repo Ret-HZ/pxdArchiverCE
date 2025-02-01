@@ -64,7 +64,13 @@
             <MenuItem Header="Help">
                 <MenuItem x:Name="mi_Help_About" Header="About pxdArchiverCE" Click="mi_Help_About_Click">
                     <MenuItem.Icon>
-                        <Image Source="/Resources/Icons/pxdArchiverCE/pxdArchiverCE_16.png"/>
+                        <Image Source="/Resources/Icons/pxdArchiverCE/pxdArchiverCE_16.png" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem x:Name="mi_Help_Donate" Header="Donate" Click="mi_Help_Donate_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Icons/ko-fi.png" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

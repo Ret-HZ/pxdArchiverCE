@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Icons\ko-fi.png" />
     <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico" />
     <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_1024.png" />
     <None Remove="Resources\Icons\pxdArchiverCE\pxdArchiverCE_128.png" />
@@ -45,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Icons\ko-fi.png" />
     <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE.ico" />
     <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_1024.png" />
     <Resource Include="Resources\Icons\pxdArchiverCE\pxdArchiverCE_128.png" />

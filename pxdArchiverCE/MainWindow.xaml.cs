@@ -1092,6 +1092,15 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Help (Donate) MenuItem. Will open the Ko-fi page.
+        /// </summary>
+        private void mi_Help_Donate_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer", "https://ko-fi.com/ret_hz");
+        }
+
+
+        /// <summary>
         /// Click event for the DataGrid's ContextMenu MenuItem (Open). Will open the selected directory or file.
         /// </summary>
         private void datagrid_ParContents_ContextMenu_mi_Open_Click(object sender, RoutedEventArgs e)
