@@ -67,6 +67,11 @@
                         <Image Source="/Resources/Icons/pxdArchiverCE/pxdArchiverCE_16.png" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="mi_Help_GitHub" Header="GitHub" Click="mi_Help_GitHub_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Icons/github.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem x:Name="mi_Help_Donate" Header="Donate" Click="mi_Help_Donate_Click">
                     <MenuItem.Icon>

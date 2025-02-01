@@ -1092,6 +1092,15 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Help (GitHub) MenuItem. Will open the GitHub repository page.
+        /// </summary>
+        private void mi_Help_GitHub_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer", "https://github.com/Ret-HZ/pxdArchiverCE");
+        }
+
+
+        /// <summary>
         /// Click event for the Help (Donate) MenuItem. Will open the Ko-fi page.
         /// </summary>
         private void mi_Help_Donate_Click(object sender, RoutedEventArgs e)
