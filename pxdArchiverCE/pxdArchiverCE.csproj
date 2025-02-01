@@ -30,6 +30,7 @@
     <None Remove="Resources\Images\OneLevelUp.png" />
     <None Remove="Resources\Images\Previous.png" />
     <None Remove="Resources\Images\Save.png" />
+    <None Remove="Resources\Licenses.txt" />
     <None Remove="Resources\SettingsTemplate.ini" />
   </ItemGroup>
 
@@ -67,6 +68,7 @@
     <Resource Include="Resources\Images\OneLevelUp.png" />
     <Resource Include="Resources\Images\Previous.png" />
     <Resource Include="Resources\Images\Save.png" />
+    <EmbeddedResource Include="Resources\Licenses.txt" />
     <EmbeddedResource Include="Resources\SettingsTemplate.ini" />
   </ItemGroup>
 

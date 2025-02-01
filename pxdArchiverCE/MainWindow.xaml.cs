@@ -1101,6 +1101,17 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Click event for the Help (Licenses) MenuItem. Will open the Licenses window.
+        /// </summary>
+
+        private void mi_Help_Licenses_Click(object sender, RoutedEventArgs e)
+        {
+            LicensesWindow licensesWindow = new LicensesWindow();
+            licensesWindow.ShowDialog();
+        }
+
+
+        /// <summary>
         /// Click event for the Help (Donate) MenuItem. Will open the Ko-fi page.
         /// </summary>
         private void mi_Help_Donate_Click(object sender, RoutedEventArgs e)

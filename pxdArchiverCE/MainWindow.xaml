@@ -72,6 +72,7 @@
                         <Image Source="/Resources/Icons/github.png" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="mi_Help_Licenses" Header="Licenses" Click="mi_Help_Licenses_Click"/>
                 <Separator/>
                 <MenuItem x:Name="mi_Help_Donate" Header="Donate" Click="mi_Help_Donate_Click">
                     <MenuItem.Icon>
