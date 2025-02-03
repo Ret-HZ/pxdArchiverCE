@@ -91,6 +91,24 @@ namespace pxdArchiverCE
                     PXDArchive = null;
                 }
 
+                // Check the file magic and provide error messages in case it is another format or possibly encrypted
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read)))
+                {
+                    byte[] magic = reader.ReadBytes(4);
+                    
+                    if (!magic.SequenceEqual(new byte[4] { 0x50, 0x41, 0x52, 0x43 })) // PARC
+                    {
+                        if (magic.SequenceEqual(new byte[4] { 0x43, 0x50, 0x4B, 0x20 })) // Check for the CPK magic (movie/stream in the Judgment games have a .par extension for some reason)
+                        {
+                            throw new Exception("Not a PARC file. Possible CPK.");
+                        }
+                        else
+                        {
+                            throw new Exception("Not a PARC file. Different format or possibly encrypted?");
+                        }
+                    }
+                }
+
                 var parameters = new ParArchiveReaderParameters
                 {
                     Recursive = Settings.HandleNestedPar
