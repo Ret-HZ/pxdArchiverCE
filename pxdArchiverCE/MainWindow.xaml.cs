@@ -547,6 +547,8 @@ namespace pxdArchiverCE
                                 destinationNode.Add(node);
                             }
                         }
+
+                        NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                         RefreshCurrentDirectory();
                         PopulateTreeView(PXDArchive);
                         return;
@@ -575,6 +577,7 @@ namespace pxdArchiverCE
                     }
                 }
 
+                NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                 RefreshCurrentDirectory();
                 PopulateTreeView(PXDArchive);
                 return;
@@ -599,6 +602,7 @@ namespace pxdArchiverCE
                         parEntry.Node.Parent.Remove(parEntry.Node);
                         parEntry.Node.Dispose();
                     }
+                    NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                     RefreshCurrentDirectory();
                     PopulateTreeView(PXDArchive);
                 }
@@ -996,6 +1000,7 @@ namespace pxdArchiverCE
         {
             mi_Settings_CopyParToTempLocation.IsChecked = Settings.CopyParToTempLocation;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
+            mi_Settings_AlternativeFileSorting.IsChecked = Settings.AlternativeFileSorting;
             mi_Settings_HandleNestedPar.IsChecked = Settings.HandleNestedPar;
             mi_Settings_SizeDisplayUnitAuto.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.AUTO;
             mi_Settings_SizeDisplayUnitBytes.IsChecked = Settings.SizeDisplayUnit == SizeDisplayUnit.BYTES;
@@ -1021,6 +1026,24 @@ namespace pxdArchiverCE
             Settings.LegacyMode = !Settings.LegacyMode;
             mi_Settings_LegacyMode.IsChecked = Settings.LegacyMode;
             Settings.SaveSettings();
+        }
+
+
+        /// <summary>
+        /// Click event for the Settings (AlternativeFileSorting) MenuItem. Will toggle the AlternativeFileSorting setting.
+        /// </summary>
+        private void mi_Settings_AlternativeFileSorting_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.AlternativeFileSorting = !Settings.AlternativeFileSorting;
+            mi_Settings_AlternativeFileSorting.IsChecked = Settings.AlternativeFileSorting;
+            Settings.SaveSettings();
+
+            if (PXDArchive != null)
+            {
+                NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
+                RefreshCurrentDirectory();
+                PopulateTreeView(PXDArchive);
+            }
         }
 
 
@@ -1318,6 +1341,7 @@ namespace pxdArchiverCE
                     parEntry.Node.Name = chosenName;
                 }
             }
+            NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
             PopulateTreeView(PXDArchive);

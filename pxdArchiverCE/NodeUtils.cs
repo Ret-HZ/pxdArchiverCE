@@ -33,12 +33,52 @@ namespace pxdArchiverCE
             {
                 Node newNode = GetDirectoryAsNode(directoryPath);
                 parentNode.Add(newNode);
-                parentNode.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
                 return true;
             }
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Sort the node's children alphabetically and based on if they are directories or not.
+        /// </summary>
+        /// <param name="root">The root node to sort.</param>
+        /// <param name="sortWithUpperInvariant">Alternative sorting mode. (Needed by Kenzan)</param>
+        // https://github.com/Kaplas80/TF3.YakuzaPlugins/pull/15
+        internal static void SortNodes(Node root, bool sortWithUpperInvariant = false)
+        {
+            if (sortWithUpperInvariant)
+            {
+                root.SortChildren((x, y) =>
+                {
+                    // Determine if each item is a directory. Nested par directories will be treated as files.
+                    bool xIsTrueDirectory = x.IsContainer && !x.Name.EndsWith(".par", StringComparison.OrdinalIgnoreCase);
+                    bool yIsTrueDirectory = y.IsContainer && !y.Name.EndsWith(".par", StringComparison.OrdinalIgnoreCase);
+
+                    // Ensure true directories come first.
+                    if (xIsTrueDirectory && !yIsTrueDirectory) return -1;
+                    if (!xIsTrueDirectory && yIsTrueDirectory) return 1;
+
+                    return string.CompareOrdinal(x.Name.ToUpperInvariant(), y.Name.ToUpperInvariant());
+                });
+            }
+            else
+            {
+                root.SortChildren((x, y) =>
+                {
+                    // Determine if each item is a directory. Nested par directories will be treated as files.
+                    bool xIsTrueDirectory = x.IsContainer && !x.Name.EndsWith(".par", StringComparison.OrdinalIgnoreCase);
+                    bool yIsTrueDirectory = y.IsContainer && !y.Name.EndsWith(".par", StringComparison.OrdinalIgnoreCase);
+
+                    // Ensure true directories come first.
+                    if (xIsTrueDirectory && !yIsTrueDirectory) return -1;
+                    if (!xIsTrueDirectory && yIsTrueDirectory) return 1;
+
+                    return string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant());
+                });
             }
         }
 

@@ -47,6 +47,8 @@
                           ToolTip="Copy the PARC file to a temporary location.&#x0a;This may increase initial load times due to the copy process but will allow overwriting the original file."/>
                 <MenuItem x:Name="mi_Settings_LegacyMode" Header="Legacy Mode" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_LegacyMode_Click"
                           ToolTip="Format PARC file directories to be compatible with older versions of the PXD Engine."/>
+                <MenuItem x:Name="mi_Settings_AlternativeFileSorting" Header="Alternative File Sorting" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_AlternativeFileSorting_Click"
+                          ToolTip="Alternative file and directory sorting. This option may be required by some old games such as Kenzan!."/>
                 <MenuItem x:Name="mi_Settings_HandleNestedPar" Header="Handle nested PARC files" IsCheckable="True" Loaded="mi_Settings_Loaded" Click="mi_Settings_HandleNestedPar_Click"
                           ToolTip="Nested PARC files will be treated as folders."/>
                 <MenuItem x:Name="mi_Settings_SizeDisplayUnit" Header="Size Display Unit" IsCheckable="False" ToolTip="Unit for representing file sizes.">
