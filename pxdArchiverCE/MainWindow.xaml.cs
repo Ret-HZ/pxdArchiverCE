@@ -1,4 +1,4 @@
-﻿using ParLibrary.Converter;
+using ParLibrary.Converter;
 using ParLibrary;
 using System.Windows;
 using Yarhl.FileSystem;
@@ -8,13 +8,12 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using Yarhl.IO;
 using pxdArchiverCE.Controls;
 using System.Windows.Input;
 using System.Text;
 using System.Windows.Threading;
-using System.Windows.Documents;
+
 
 namespace pxdArchiverCE
 {
@@ -927,7 +926,7 @@ namespace pxdArchiverCE
         /// </summary>
         private void btn_Navigation_Search_Click(object sender, RoutedEventArgs e)
         {
-            // Get the search text from the RichTextBox
+            // Get the search text from the TextBox
             string searchText = tb_Navigation_Input.Text;
 
             if (string.IsNullOrWhiteSpace(searchText))
@@ -1894,16 +1893,6 @@ namespace pxdArchiverCE
         {
             DataGridCell cell = sender as DataGridCell;
             cell.ClearValue(BackgroundProperty);
-        }
-
-        private void btn_Navigation_Search_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
-
-        private void btn_Navigation_Search_KeyDown(object sender, KeyEventArgs e)
-        {
-
         }
     }
 
