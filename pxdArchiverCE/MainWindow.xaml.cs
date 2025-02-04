@@ -1,4 +1,4 @@
-﻿using ParLibrary.Converter;
+using ParLibrary.Converter;
 using ParLibrary;
 using System.Windows;
 using Yarhl.FileSystem;
@@ -13,6 +13,7 @@ using pxdArchiverCE.Controls;
 using System.Windows.Input;
 using System.Text;
 using System.Windows.Threading;
+
 
 namespace pxdArchiverCE
 {
@@ -920,7 +921,90 @@ namespace pxdArchiverCE
             OpenDirectory(NavigationHistoryCurrent.Parent);
         }
 
+        /// <summary>
+        /// Search Event to Filter for specific files within a PARC(.par) file.
+        /// </summary>
+        private void btn_Navigation_Search_Click(object sender, RoutedEventArgs e)
+        {
+            // Get the search text from the RichTextBox
+            string searchText = tb_Navigation_Input.Text;
 
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                RefreshCurrentDirectory();
+                return;
+            }
+
+            List<ParEntry> filteredEntries = new List<ParEntry>();
+
+            // Search through all nodes in the current directory
+            foreach (Node node in NavigationHistoryCurrent.Children)
+            {
+                if (node.IsContainer)
+                {
+                    // Search through all files in the container
+                    foreach (Node file in Navigator.IterateNodes(node))
+                    {
+                        if (!file.IsContainer &&
+                            file.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                        {
+                            filteredEntries.Add(CreateParEntry(file));
+                        }
+                    }
+                }
+                else if (!node.IsContainer &&
+                         node.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                {
+                    filteredEntries.Add(CreateParEntry(node));
+                }
+            }
+
+            datagrid_ParContents.ItemsSource = filteredEntries;
+        }
+
+        private ParEntry CreateParEntry(Node node)
+        {
+            var parFile = node.GetFormatAs<ParFile>();
+            return new ParEntry()
+            {
+                Icon = GetDataGridEntryIcon(node.Name, node.IsContainer),
+                Name = node.Name,
+                Type = node.IsContainer ? "Folder" :
+                       Util.GetFileTypeDescription(Path.GetExtension(node.Name)),
+                Size = node.IsContainer ? GetContainerSize(node).ToString() :
+                       Util.FormatBytes(parFile.DecompressedSize),
+                CompressedSize = node.IsContainer ? GetContainerSize(node).ToString() :
+                       Util.FormatBytes(parFile.Stream.Length),
+                Ratio = node.IsContainer ? "---" :
+                       $"{(int)((1.0 * parFile.Stream.Length / parFile.DecompressedSize) * 100)}%",
+                Time = parFile.FileDate,
+                Directory = Util.GetNodeDirectory(node),
+                Node = node,
+                TotalSize = node.IsContainer ? GetContainerSize(node) : parFile.DecompressedSize
+            };
+        }
+
+        private long GetContainerSize(Node container)
+        {
+            long totalSize = 0;
+            foreach (Node node in Navigator.IterateNodes(container))
+            {
+                if (!node.IsContainer)
+                {
+                    var file = node.GetFormatAs<ParFile>();
+                    totalSize += file.DecompressedSize;
+                }
+            }
+            return totalSize;
+        }
+
+        private void tb_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                btn_Navigation_Search.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
+        }
         /// <summary>
         /// File drop event for the Directory section of the UI.
         /// </summary>
