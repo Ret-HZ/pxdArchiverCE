@@ -1,4 +1,4 @@
-﻿<Window x:Class="pxdArchiverCE.MainWindow"
+<Window x:Class="pxdArchiverCE.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,8 +16,9 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -98,6 +99,7 @@
                     <Button ToolTip="Open" Click="FileOpen_Click">
                         <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
                     </Button>
+
                     <Button ToolTip="Save" Click="FileSave_Click">
                         <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
                     </Button>
@@ -114,8 +116,39 @@
                     <Button x:Name="btn_Navigation_DirectoryUp" ToolTip="Directory Up" IsEnabled="False" Click="btn_Navigation_DirectoryUp_Click">
                         <Image Source="/Resources/Images/OneLevelUp.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </Button>
+                    <TextBox x:Name="tb_Navigation_Input" AllowDrop="True" TextChanged="btn_Navigation_Search_TextChanged" Text="" RenderTransformOrigin="0.5,0.5" Width="177" Height="25" HorizontalAlignment="Left" KeyDown="tb_Search_KeyDown">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Static ToolBar.TextBoxStyleKey}}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                                BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                                Background="{TemplateBinding Background}">
+                                                <Grid>
+                                                    <ScrollViewer x:Name="PART_ContentHost" />
+                                                    <TextBlock HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    FontStyle="Italic"
+                                                    Foreground="#999999"
+                                                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, 
+                                                                Path=Text.IsEmpty, 
+                                                                Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                    Text="  Search:"/>
+                                                </Grid>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button x:Name="btn_Navigation_Search" ToolTip="Search" Click="btn_Navigation_Search_Click"   BorderBrush="#00707070" Background="#00DDDDDD" HorizontalAlignment="Left" Width="22">
+                        <Image Source="/Search_16x.png" Width="16" Height="16"/>
+                    </Button>
                 </ToolBar>
             </ToolBarTray>
+
         </Grid>
 
 
@@ -154,10 +187,14 @@
 
 
             <Grid Grid.Column="1" x:Name="grid_ParContentsParent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="37*"/>
+                    <ColumnDefinition Width="113*"/>
+                </Grid.ColumnDefinitions>
                 <pxd:PxdDataGrid x:Name="datagrid_ParContents" Background="White" EnableRowVirtualization="True" EnableColumnVirtualization="True" GridLinesVisibility="None" HeadersVisibility="Column" SelectionUnit="Cell"
                        IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Visible"
                       CanUserResizeRows="False" CanUserReorderColumns="False" SelectionMode="Extended" AllowDrop="True" Drop="datagrid_ParContents_Drop" MouseLeftButtonDown="datagrid_ParContents_MouseLeftButtonDown" MouseLeftButtonUp="datagrid_ParContents_MouseLeftButtonUp" 
-                      MouseMove="datagrid_ParContents_MouseMove" Loaded="datagrid_ParContents_Loaded">
+                      MouseMove="datagrid_ParContents_MouseMove" Loaded="datagrid_ParContents_Loaded" Grid.ColumnSpan="2">
                     <DataGrid.Resources>
                         <Style TargetType="{x:Type DataGridCell}">
                             <Setter Property="BorderThickness" Value="0"/>
@@ -229,11 +266,11 @@
                 </pxd:PxdDataGrid>
 
                 <!-- Click-through canvas overlay to render the selection box -->
-                <Canvas x:Name="canvas_SelectionBox" IsHitTestVisible="False">
+                <Canvas x:Name="canvas_SelectionBox" IsHitTestVisible="False" Grid.ColumnSpan="2">
                     <Rectangle x:Name="rectangle_SelectionBox" Visibility="Collapsed" Stroke="Black" StrokeThickness="1.5" StrokeDashArray="1,1" Fill="#3049a6f2"/>
                 </Canvas>
             </Grid>
         </Grid>
-        
+
     </Grid>
 </Window>
