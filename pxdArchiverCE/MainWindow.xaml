@@ -16,8 +16,9 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -98,6 +99,7 @@
                     <Button ToolTip="Open" Click="FileOpen_Click">
                         <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
                     </Button>
+
                     <Button ToolTip="Save" Click="FileSave_Click">
                         <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
                     </Button>
@@ -114,8 +116,39 @@
                     <Button x:Name="btn_Navigation_DirectoryUp" ToolTip="Directory Up" IsEnabled="False" Click="btn_Navigation_DirectoryUp_Click">
                         <Image Source="/Resources/Images/OneLevelUp.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </Button>
+                    <TextBox x:Name="tb_Navigation_Input" AllowDrop="True" TextChanged="btn_Navigation_Search_TextChanged" Text="" RenderTransformOrigin="0.5,0.5" Width="177" Height="25" HorizontalAlignment="Left" KeyDown="tb_Search_KeyDown">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Static ToolBar.TextBoxStyleKey}}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                                BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                                Background="{TemplateBinding Background}">
+                                                <Grid>
+                                                    <ScrollViewer x:Name="PART_ContentHost" />
+                                                    <TextBlock HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    FontStyle="Italic"
+                                                    Foreground="#999999"
+                                                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, 
+                                                                Path=Text.IsEmpty, 
+                                                                Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                    Text="  Search:"/>
+                                                </Grid>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button x:Name="btn_Navigation_Search" ToolTip="Search" Click="btn_Navigation_Search_Click"   BorderBrush="#00707070" Background="#00DDDDDD" HorizontalAlignment="Left" Width="22">
+                        <Image Source="/Search_16x.png" Width="16" Height="16"/>
+                    </Button>
                 </ToolBar>
             </ToolBarTray>
+
         </Grid>
 
 
@@ -234,6 +267,6 @@
                 </Canvas>
             </Grid>
         </Grid>
-        
+
     </Grid>
 </Window>
