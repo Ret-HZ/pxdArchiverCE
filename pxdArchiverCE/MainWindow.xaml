@@ -150,7 +150,7 @@
                     </TextBox.Style>
                 </TextBox>
                 <Button x:Name="btn_Navigation_Search" ToolTip="Search" Click="btn_Navigation_Search_Click" BorderBrush="#00707070" Background="#00DDDDDD" HorizontalAlignment="Left" Width="22">
-                    <Image Source="/Resources/Images/Search.png" Width="16" Height="16"/>
+                    <Image Source="/Resources/Images/Search.png" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 </Button>
             </ToolBar>
         </Grid>
