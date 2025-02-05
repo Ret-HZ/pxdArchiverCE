@@ -69,9 +69,7 @@
     <Resource Include="Resources\Images\OneLevelUp.png" />
     <Resource Include="Resources\Images\Previous.png" />
     <Resource Include="Resources\Images\Save.png" />
-    <Resource Include="Resources\Images\Search.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\Images\Search.png" />
     <EmbeddedResource Include="Resources\Licenses.txt" />
     <EmbeddedResource Include="Resources\SettingsTemplate.ini" />
   </ItemGroup>
