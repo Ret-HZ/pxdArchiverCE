@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Text;
 using System.Windows.Threading;
 
+
 namespace pxdArchiverCE
 {
     /// <summary>
@@ -40,7 +41,7 @@ namespace pxdArchiverCE
         /// Previously opened nodes.
         /// </summary>
         Stack<Node> NavigationHistoryPrevious = new Stack<Node>();
-        
+
         /// <summary>
         /// Previously opened nodes after going back in navigation.
         /// </summary>
@@ -95,7 +96,7 @@ namespace pxdArchiverCE
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read)))
                 {
                     byte[] magic = reader.ReadBytes(4);
-                    
+
                     if (!magic.SequenceEqual(new byte[4] { 0x50, 0x41, 0x52, 0x43 })) // PARC
                     {
                         if (magic.SequenceEqual(new byte[4] { 0x43, 0x50, 0x4B, 0x20 })) // Check for the CPK magic (movie/stream in the Judgment games have a .par extension for some reason)
@@ -758,7 +759,7 @@ namespace pxdArchiverCE
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     outPath = saveFileDialog.FileName;
-                    
+
                     // Cancel if attempting to save over the same file that is currently open.
                     if (outPath == PXDArchivePath)
                     {
@@ -920,14 +921,97 @@ namespace pxdArchiverCE
             OpenDirectory(NavigationHistoryCurrent.Parent);
         }
 
+        /// <summary>
+        /// Search Event to Filter for specific files within a PARC(.par) file.
+        /// </summary>
+        private void btn_Navigation_Search_Click(object sender, RoutedEventArgs e)
+        {
+            // Get the search text from the RichTextBox
+            string searchText = tb_Navigation_Input.Text;
 
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                RefreshCurrentDirectory();
+                return;
+            }
+
+            List<ParEntry> filteredEntries = new List<ParEntry>();
+
+            // Search through all nodes in the current directory
+            foreach (Node node in NavigationHistoryCurrent.Children)
+            {
+                if (node.IsContainer)
+                {
+                    // Search through all files in the container
+                    foreach (Node file in Navigator.IterateNodes(node))
+                    {
+                        if (!file.IsContainer &&
+                            file.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                        {
+                            filteredEntries.Add(CreateParEntry(file));
+                        }
+                    }
+                }
+                else if (!node.IsContainer &&
+                         node.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                {
+                    filteredEntries.Add(CreateParEntry(node));
+                }
+            }
+
+            datagrid_ParContents.ItemsSource = filteredEntries;
+        }
+
+        private ParEntry CreateParEntry(Node node)
+        {
+            var parFile = node.GetFormatAs<ParFile>();
+            return new ParEntry()
+            {
+                Icon = GetDataGridEntryIcon(node.Name, node.IsContainer),
+                Name = node.Name,
+                Type = node.IsContainer ? "Folder" :
+                       Util.GetFileTypeDescription(Path.GetExtension(node.Name)),
+                Size = node.IsContainer ? GetContainerSize(node).ToString() :
+                       Util.FormatBytes(parFile.DecompressedSize),
+                CompressedSize = node.IsContainer ? GetContainerSize(node).ToString() :
+                       Util.FormatBytes(parFile.Stream.Length),
+                Ratio = node.IsContainer ? "---" :
+                       $"{(int)((1.0 * parFile.Stream.Length / parFile.DecompressedSize) * 100)}%",
+                Time = parFile.FileDate,
+                Directory = Util.GetNodeDirectory(node),
+                Node = node,
+                TotalSize = node.IsContainer ? GetContainerSize(node) : parFile.DecompressedSize
+            };
+        }
+
+        private long GetContainerSize(Node container)
+        {
+            long totalSize = 0;
+            foreach (Node node in Navigator.IterateNodes(container))
+            {
+                if (!node.IsContainer)
+                {
+                    var file = node.GetFormatAs<ParFile>();
+                    totalSize += file.DecompressedSize;
+                }
+            }
+            return totalSize;
+        }
+
+        private void tb_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                btn_Navigation_Search.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
+        }
         /// <summary>
         /// File drop event for the Directory section of the UI.
         /// </summary>
         private void grid_ParDirectory_Drop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (files!= null && files.Length > 0)
+            if (files != null && files.Length > 0)
             {
                 OpenPAR(files[0]);
             }
@@ -1200,7 +1284,7 @@ namespace pxdArchiverCE
                 {
                     Filter = $"{nodeExtension.ToUpper().Substring(1)} File (*{nodeExtension})|*{nodeExtension}|" + "All types (*.*)|*.*",
                     FileName = node.Name,
-                    
+
                 };
                 if (saveFileDialog.ShowDialog() == true)
                 {
@@ -1555,7 +1639,7 @@ namespace pxdArchiverCE
                             else
                             {
                                 if (hasReachedSelectionBox) hasExitedSelectionBox = true;
-                                
+
                                 if (isScrollingUp || lastScrollDirection == ScrollDirection.UP)
                                 {
                                     if (!hasReachedSelectionBox && datagrid_ParContents.SelectedCells.Contains(cellInfo))
@@ -1673,7 +1757,7 @@ namespace pxdArchiverCE
             List<VirtualFileDataObject.FileDescriptor> returnList = new List<VirtualFileDataObject.FileDescriptor>();
             if (node.IsContainer)
             {
-                foreach(Node child in node.Children)
+                foreach (Node child in node.Children)
                 {
                     returnList.AddRange(PopulateVirtualFileDataObjectFileDescriptorListFromNode(child, Path.Combine(directory, node.Name)));
                 }
@@ -1731,7 +1815,7 @@ namespace pxdArchiverCE
 
         #endregion
 
-        
+
         bool isClickingCell = false;
         bool isMouseLeftButtonDownDragCell = false;
         bool isCheckDragCell = false;
@@ -1871,7 +1955,8 @@ namespace pxdArchiverCE
         /// Binded to the <see cref="TreeViewItem"/>'s IsExpanded property.
         /// </summary>
         private bool isExpanded = false;
-        public bool IsExpanded {
+        public bool IsExpanded
+        {
             get
             {
                 return isExpanded;
@@ -1879,7 +1964,7 @@ namespace pxdArchiverCE
             set
             { // Prevent folders without subdirectories from displaying the expanded icon
                 if (Children != null && Children.Count > 0) isExpanded = value;
-            } 
+            }
         }
     }
 }
