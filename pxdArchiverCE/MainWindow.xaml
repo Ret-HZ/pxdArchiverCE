@@ -135,10 +135,12 @@
                                                            VerticalAlignment="Center"
                                                            FontStyle="Italic"
                                                            Foreground="#999999"
+                                                           Margin="5,0,0,0"
+                                                           IsHitTestVisible="False"
                                                            Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, 
                                                            Path=Text.IsEmpty, 
                                                            Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                           Text="  Search"/>
+                                                           Text="Search"/>
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>
