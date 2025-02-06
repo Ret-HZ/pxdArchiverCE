@@ -12,7 +12,7 @@ namespace pxdArchiverCE
         {
             try
             {
-                Node newNode = NodeFactory.FromFile(filePath, FileOpenMode.Read);
+                Node newNode = NodeFactory.FromArray(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
                 newNode.TransformWith(new ParFile());
                 ParFile parFile = newNode.GetFormatAs<ParFile>();
                 parFile.FileDate = File.GetLastWriteTime(filePath);
