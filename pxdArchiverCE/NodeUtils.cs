@@ -8,6 +8,12 @@ namespace pxdArchiverCE
 {
     internal static class NodeUtils
     {
+        /// <summary>
+        /// Adds a copy of the file located at the specified path to the chosen <see cref="Node"/>.
+        /// </summary>
+        /// <param name="parentNode">The node to add the file to.</param>
+        /// <param name="filePath">The file to add.</param>
+        /// <returns>A <see cref="bool"/> indicating if this operation completed successfully.</returns>
         internal static bool AddFile(Node parentNode, string filePath)
         {
             try
@@ -27,6 +33,12 @@ namespace pxdArchiverCE
         }
 
 
+        /// <summary>
+        /// Adds a copy of the directory located at the specified path and all its contents to the chosen <see cref="Node"/>.
+        /// </summary>
+        /// <param name="parentNode">The node to add the directory to.</param>
+        /// <param name="filePath">The directory to add.</param>
+        /// <returns>A <see cref="bool"/> indicating if this operation completed successfully.</returns>
         internal static bool AddDirectory(Node parentNode, string directoryPath)
         {
             try
@@ -83,6 +95,11 @@ namespace pxdArchiverCE
         }
 
 
+        /// <summary>
+        /// Create a container <see cref="Node"/> with the contents of the specified directory.
+        /// </summary>
+        /// <param name="directoryPath">The directory to create the <see cref="Node"/> from.</param>
+        /// <returns>A container <see cref="Node"/>.</returns>
         internal static Node GetDirectoryAsNode(string directoryPath)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
