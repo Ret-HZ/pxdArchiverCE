@@ -332,17 +332,14 @@ namespace pxdArchiverCE
 
 
         /// <summary>
-        /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
+        /// Populates the DataGrid with the specified nodes.
         /// </summary>
-        /// <param name="rootNode">The node to act as root of the directory.</param>
-        private void PopulateDataGrid(Node rootNode)
+        /// <param name="nodes">The nodes to populate the DataGrid with.</param>
+        private void PopulateDataGrid(List<Node> nodes)
         {
-            if (rootNode == null) return;
-
-            string directory = Util.GetNodeDirectory(rootNode);
-
             List<ParEntry> entries = new List<ParEntry>();
-            foreach (Node node in rootNode.Children)
+
+            foreach (Node node in nodes)
             {
                 long sizeBytes = 0;
                 long sizeBytesCompressed = 0;
@@ -404,13 +401,28 @@ namespace pxdArchiverCE
                         CompressedSize = compressedSize,
                         Ratio = ratio,
                         Time = time,
-                        Directory = directory,
+                        Directory = Util.GetNodeDirectory(node),
                         Node = node,
                         TotalSize = totalSize,
                     });
             }
 
             datagrid_ParContents.ItemsSource = entries;
+        }
+
+
+        /// <summary>
+        /// Populates the DataGrid with the contents of the selected node, which will act as root of that directory.
+        /// </summary>
+        /// <param name="rootNode">The node to act as root of the directory.</param>
+        private void PopulateDataGrid(Node rootNode)
+        {
+            if (rootNode == null) return;
+
+            if (rootNode.IsContainer)
+            {
+                PopulateDataGrid(rootNode.Children.ToList());
+            }
         }
 
 
@@ -921,12 +933,15 @@ namespace pxdArchiverCE
             OpenDirectory(NavigationHistoryCurrent.Parent);
         }
 
+
         /// <summary>
-        /// Search Event to Filter for specific files within a PARC(.par) file.
+        /// Search Event to Filter for specific files within a PARC (.par) file.
         /// </summary>
         private void btn_Navigation_Search_Click(object sender, RoutedEventArgs e)
         {
-            // Get the search text from the RichTextBox
+            if (PXDArchive == null) return;
+
+            // Get the search text from the TextBox
             string searchText = tb_Navigation_Input.Text;
 
             if (string.IsNullOrWhiteSpace(searchText))
@@ -935,69 +950,23 @@ namespace pxdArchiverCE
                 return;
             }
 
-            List<ParEntry> filteredEntries = new List<ParEntry>();
+            List<Node> filteredEntries = new List<Node>();
 
             // Search through all nodes in the current directory
-            foreach (Node node in NavigationHistoryCurrent.Children)
+            foreach (Node node in Navigator.IterateNodes(NavigationHistoryCurrent))
             {
-                if (node.IsContainer)
+                if (node.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Search through all files in the container
-                    foreach (Node file in Navigator.IterateNodes(node))
-                    {
-                        if (!file.IsContainer &&
-                            file.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                        {
-                            filteredEntries.Add(CreateParEntry(file));
-                        }
-                    }
-                }
-                else if (!node.IsContainer &&
-                         node.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                {
-                    filteredEntries.Add(CreateParEntry(node));
+                    filteredEntries.Add(node);
                 }
             }
-
-            datagrid_ParContents.ItemsSource = filteredEntries;
+            PopulateDataGrid(filteredEntries);
         }
 
-        private ParEntry CreateParEntry(Node node)
-        {
-            var parFile = node.GetFormatAs<ParFile>();
-            return new ParEntry()
-            {
-                Icon = GetDataGridEntryIcon(node.Name, node.IsContainer),
-                Name = node.Name,
-                Type = node.IsContainer ? "Folder" :
-                       Util.GetFileTypeDescription(Path.GetExtension(node.Name)),
-                Size = node.IsContainer ? GetContainerSize(node).ToString() :
-                       Util.FormatBytes(parFile.DecompressedSize),
-                CompressedSize = node.IsContainer ? GetContainerSize(node).ToString() :
-                       Util.FormatBytes(parFile.Stream.Length),
-                Ratio = node.IsContainer ? "---" :
-                       $"{(int)((1.0 * parFile.Stream.Length / parFile.DecompressedSize) * 100)}%",
-                Time = parFile.FileDate,
-                Directory = Util.GetNodeDirectory(node),
-                Node = node,
-                TotalSize = node.IsContainer ? GetContainerSize(node) : parFile.DecompressedSize
-            };
-        }
 
-        private long GetContainerSize(Node container)
-        {
-            long totalSize = 0;
-            foreach (Node node in Navigator.IterateNodes(container))
-            {
-                if (!node.IsContainer)
-                {
-                    var file = node.GetFormatAs<ParFile>();
-                    totalSize += file.DecompressedSize;
-                }
-            }
-            return totalSize;
-        }
-
+        /// <summary>
+        /// Search bar TextBox key down event. Will execute the search function on the current directory.
+        /// </summary>
         private void tb_Search_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -1005,6 +974,8 @@ namespace pxdArchiverCE
                 btn_Navigation_Search.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             }
         }
+
+
         /// <summary>
         /// File drop event for the Directory section of the UI.
         /// </summary>
