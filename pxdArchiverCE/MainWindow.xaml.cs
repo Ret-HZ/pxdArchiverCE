@@ -621,7 +621,17 @@ namespace pxdArchiverCE
                             Node node = Navigator.SearchNode(PXDArchive, nodePath);
                             if (node != null && node != destinationNode)
                             {
-                                destinationNode.Add(node);
+                                // Check if directory already exists and merge if it does.
+                                Node existingDirectory = destinationNode.Children[node.Name];
+                                if (existingDirectory != null && existingDirectory.IsContainer)
+                                {
+                                    NodeContainerFormat nodeContainer = node.GetFormatAs<NodeContainerFormat>();
+                                    nodeContainer.MoveChildrenTo(existingDirectory, true);
+                                }
+                                else
+                                {
+                                    destinationNode.Add(node);
+                                }
                             }
                         }
 

@@ -44,7 +44,17 @@ namespace pxdArchiverCE
             try
             {
                 Node newNode = GetDirectoryAsNode(directoryPath);
-                parentNode.Add(newNode);
+                // Check if directory already exists and merge if it does.
+                Node existingDirectory = parentNode.Children[newNode.Name];
+                if (existingDirectory != null && existingDirectory.IsContainer)
+                {
+                    NodeContainerFormat newContainer = newNode.GetFormatAs<NodeContainerFormat>();
+                    newContainer.MoveChildrenTo(existingDirectory, true);
+                }
+                else
+                {
+                    parentNode.Add(newNode);
+                }
                 return true;
             }
             catch (Exception ex)
