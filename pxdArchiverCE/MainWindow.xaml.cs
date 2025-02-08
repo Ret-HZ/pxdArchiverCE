@@ -134,7 +134,7 @@ namespace pxdArchiverCE
                 NavigationHistoryCurrent = null;
 
                 OpenDirectory(PXDArchive);
-                PopulateTreeView(PXDArchive);
+                PopulateTreeView(PXDArchive, true);
                 this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
             }
             catch (Exception ex)
@@ -429,11 +429,13 @@ namespace pxdArchiverCE
         /// <summary>
         /// Generates an ObservableCollection with the directory structure and populates the TreeView.
         /// </summary>
-        private void PopulateTreeView(Node node)
+        /// <param name="node">The root node to populate the tree with.</param>
+        /// <param name="resetTreeViewState">If the state of currently opened directory tree should be reset.</param>
+        private void PopulateTreeView(Node node, bool resetTreeViewState = false)
         {
             if (node.Children.Count == 1 && node.Children[0].Name == ".")
             {
-                PopulateTreeView(node.Children[0]);
+                PopulateTreeView(node.Children[0], resetTreeViewState);
                 return;
             }
 
@@ -446,7 +448,37 @@ namespace pxdArchiverCE
                 IsExpanded = true,
             };
             parDirectories.Add(rootDirectory);
+
+            if (treeview_ParFolders.ItemsSource != null && !resetTreeViewState)
+            {
+                CopyParDirectoryState(parDirectories, (IEnumerable<ParDirectory>)treeview_ParFolders.ItemsSource);
+            }
+
             treeview_ParFolders.ItemsSource = parDirectories;
+        }
+
+
+        /// <summary>
+        /// Copies the state of a <see cref="ParDirectory"/> list to another.
+        /// </summary>
+        /// <param name="newParDirectories">The new <see cref="ParDirectory"/> list to copy the state to.</param>
+        /// <param name="oldParDirectories">The old <see cref="ParDirectory"/> list to copy the state from.</param>
+        private void CopyParDirectoryState(IEnumerable<ParDirectory> newParDirectories, IEnumerable<ParDirectory> oldParDirectories)
+        {
+            foreach (ParDirectory parDirectory in newParDirectories)
+            {
+                foreach (ParDirectory oldParDirectory in oldParDirectories)
+                {
+                    if (oldParDirectory.Name == parDirectory.Name)
+                    {
+                        parDirectory.IsExpanded = oldParDirectory.IsExpanded;
+                        if (parDirectory.Children.Any() && oldParDirectory.Children.Any())
+                        {
+                            CopyParDirectoryState(parDirectory.Children, oldParDirectory.Children);
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -476,6 +508,10 @@ namespace pxdArchiverCE
                 if (child.Children.Count > 0)
                 {
                     directory.Children = BuildParDirectoryList(child);
+                }
+                else
+                {
+                    directory.Children = new ObservableCollection<ParDirectory>();
                 }
 
                 childrenDirectories.Add(directory);
