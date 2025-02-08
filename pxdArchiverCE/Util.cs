@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows;
 using Yarhl.FileSystem;
 using System.Reflection;
+using System.Drawing;
 
 namespace pxdArchiverCE
 {
@@ -161,6 +162,23 @@ namespace pxdArchiverCE
                                 SHGFI_USEFILEATTRIBUTES | SHGFI_TYPENAME))
             {
                 return shfi.szTypeName;
+            }
+            return null;
+        }
+
+
+
+        public static Icon GetSmallIcon(string filePath)
+        {
+            SHFILEINFO shfi;
+            if (IntPtr.Zero != SHGetFileInfo(
+                                filePath,
+                                0,
+                                out shfi,
+                                (uint)Marshal.SizeOf(typeof(SHFILEINFO)),
+                                SHGFI_ICON | SHGFI_SMALLICON))
+            {
+                return Icon.FromHandle(shfi.hIcon);
             }
             return null;
         }

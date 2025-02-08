@@ -251,7 +251,7 @@
                         <DataGridTemplateColumn Header="" Width="SizeToCells" CanUserSort="False" CanUserResize="False" CellStyle="{StaticResource NoMargin}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding Icon}" Height="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="Linear"/>
+                                    <Image Source="{Binding Icon}" Height="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

@@ -563,7 +563,7 @@ namespace pxdArchiverCE
             {
                 string tempFilePath = Path.Combine(Settings.PATH_APPDATA_ICONS, $"{extension}");
                 File.Create(tempFilePath).Dispose();
-                Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(tempFilePath);
+                Icon icon = Util.GetSmallIcon(tempFilePath);
                 BitmapImage bmp = icon.ToBitmap().ToBitmapImage();
                 FileIconCache.TryAdd(extension, bmp);
                 return bmp;
