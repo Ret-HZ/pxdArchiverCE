@@ -427,6 +427,16 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Repopulate the <see cref="TreeView"/> with the directories of the currently opened PARC.
+        /// </summary>
+        private void RefreshDirectoryTree()
+        {
+            if (PXDArchive == null) return;
+            PopulateTreeView(PXDArchive, false);
+        }
+
+
+        /// <summary>
         /// Generates an ObservableCollection with the directory structure and populates the TreeView.
         /// </summary>
         /// <param name="node">The root node to populate the tree with.</param>
@@ -617,7 +627,7 @@ namespace pxdArchiverCE
 
                         NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                         RefreshCurrentDirectory();
-                        PopulateTreeView(PXDArchive);
+                        RefreshDirectoryTree();
                         return;
                     }
                 }
@@ -646,7 +656,7 @@ namespace pxdArchiverCE
 
                 NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                 RefreshCurrentDirectory();
-                PopulateTreeView(PXDArchive);
+                RefreshDirectoryTree();
                 return;
             }
         }
@@ -671,7 +681,7 @@ namespace pxdArchiverCE
                     }
                     NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                     RefreshCurrentDirectory();
-                    PopulateTreeView(PXDArchive);
+                    RefreshDirectoryTree();
                 }
             }
         }
@@ -768,7 +778,7 @@ namespace pxdArchiverCE
                 NavigationHistoryCurrent = null;
 
                 OpenDirectory(PXDArchive);
-                PopulateTreeView(PXDArchive);
+                PopulateTreeView(PXDArchive, true);
                 this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
             }
         }
@@ -1151,7 +1161,7 @@ namespace pxdArchiverCE
             {
                 NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                 RefreshCurrentDirectory();
-                PopulateTreeView(PXDArchive);
+                RefreshDirectoryTree();
             }
         }
 
@@ -1453,7 +1463,7 @@ namespace pxdArchiverCE
             NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
-            PopulateTreeView(PXDArchive);
+            RefreshDirectoryTree();
         }
 
 
