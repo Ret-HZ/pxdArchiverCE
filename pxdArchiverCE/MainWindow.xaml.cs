@@ -1532,20 +1532,17 @@ namespace pxdArchiverCE
         /// <summary>
         /// Mouse left button down event for the DataGrid. Will prepare and start drawing the selection box.
         /// </summary>
-        private void datagrid_ParContents_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void datagrid_ParContents_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (isClickingCell)
             {
                 return;
             }
 
-            //Event is not a cell drag
-            isCheckDragCell = false;
-
             // Capture and track the mouse
             isMouseLeftButtonDownSelection = true;
-            mouseLeftButtonDownPos = e.GetPosition(datagrid_ParContents);
-            datagrid_ParContents.CaptureMouse();
+            mouseLeftButtonDownPos = e.GetPosition(datagrid_ParContents); // Position relative to the DataGrid
+            this.CaptureMouse(); // Capture mouse at the window level
 
             // Initial placement of the selection box
             Canvas.SetLeft(rectangle_SelectionBox, mouseLeftButtonDownPos.X);
@@ -1558,36 +1555,17 @@ namespace pxdArchiverCE
 
             // Clear the selected cells
             datagrid_ParContents.SelectedCells.Clear();
+
+            // Register the mouse move event for the entire window
+            Mouse.AddMouseMoveHandler(this, Window_MouseMove);
+            Mouse.AddMouseUpHandler(this, Window_MouseLeftButtonUp);
         }
 
 
         /// <summary>
-        /// Mouse left button up event for the DataGrid. Will reset and hide the selection box.
+        /// Global mouse move event for the window. Will resize the selection box based on the cursor's position and select/deselect the items underneath it.
         /// </summary>
-        private void datagrid_ParContents_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            // Release the mouse capture and stop tracking it
-            isMouseLeftButtonDownSelection = false;
-            datagrid_ParContents.ReleaseMouseCapture();
-
-            // Reset the selection box and hide it
-            Canvas.SetLeft(rectangle_SelectionBox, 0);
-            Canvas.SetTop(rectangle_SelectionBox, 0);
-            rectangle_SelectionBox.Width = 0;
-            rectangle_SelectionBox.Height = 0;
-            rectangle_SelectionBox.Visibility = Visibility.Collapsed;
-
-            // Reset the scroll tracker
-            lastScrollDirection = ScrollDirection.NONE;
-
-            isClickingCell = false;
-        }
-
-
-        /// <summary>
-        /// Mouse move event for the DataGrid. Will resize the selection box based on the cursor's position and select/deselect the items underneath it.
-        /// </summary>
-        private void datagrid_ParContents_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Window_MouseMove(object sender, MouseEventArgs e)
         {
             // This should not happen
             if (isClickingCell && Mouse.LeftButton == MouseButtonState.Released)
@@ -1596,42 +1574,31 @@ namespace pxdArchiverCE
             }
 
             #region SelectionMouseMove
-            // Reposition the selection box if the button is held
             if (isMouseLeftButtonDownSelection)
             {
-                System.Windows.Point mousePos = e.GetPosition(datagrid_ParContents);
+                System.Windows.Point mousePos = e.GetPosition(datagrid_ParContents); // Get position relative to the DataGrid
 
-                // Prevent the selection box from getting out of the DataGrid control bounds
-                if (mousePos.X < 0) mousePos.X = 0;
-                if (mousePos.Y < 0) mousePos.Y = 0;
+                // Clamp mouse position to ensure it stays inside the DataGrid
+                double clampedX = Math.Max(0, Math.Min(mousePos.X, datagrid_ParContents.ActualWidth));
+                double clampedY = Math.Max(0, Math.Min(mousePos.Y, datagrid_ParContents.ActualHeight));
+
+                // Compute new position and size for the selection box
+                double x = Math.Min(mouseLeftButtonDownPos.X, clampedX);
+                double y = Math.Min(mouseLeftButtonDownPos.Y, clampedY);
+                double width = Math.Abs(clampedX - mouseLeftButtonDownPos.X);
+                double height = Math.Abs(clampedY - mouseLeftButtonDownPos.Y);
+
+                Canvas.SetLeft(rectangle_SelectionBox, x);
+                Canvas.SetTop(rectangle_SelectionBox, y);
+                rectangle_SelectionBox.Width = width;
+                rectangle_SelectionBox.Height = height;
 
                 isScrollingUp = ((mousePos.Y - 25) <= 0);
                 isScrollingDown = ((mousePos.Y + 25) >= datagrid_ParContents.ActualHeight);
                 if (isScrollingUp) lastScrollDirection = ScrollDirection.UP;
                 if (isScrollingDown) lastScrollDirection = ScrollDirection.DOWN;
 
-                if (mouseLeftButtonDownPos.X < mousePos.X)
-                {
-                    Canvas.SetLeft(rectangle_SelectionBox, mouseLeftButtonDownPos.X);
-                    rectangle_SelectionBox.Width = mousePos.X - mouseLeftButtonDownPos.X;
-                }
-                else
-                {
-                    Canvas.SetLeft(rectangle_SelectionBox, mousePos.X);
-                    rectangle_SelectionBox.Width = mouseLeftButtonDownPos.X - mousePos.X;
-                }
-
-                if (mouseLeftButtonDownPos.Y < mousePos.Y)
-                {
-                    Canvas.SetTop(rectangle_SelectionBox, mouseLeftButtonDownPos.Y);
-                    rectangle_SelectionBox.Height = mousePos.Y - mouseLeftButtonDownPos.Y;
-                }
-                else
-                {
-                    Canvas.SetTop(rectangle_SelectionBox, mousePos.Y);
-                    rectangle_SelectionBox.Height = mouseLeftButtonDownPos.Y - mousePos.Y;
-                }
-
+                // Update selected items based on new selection area
                 System.Windows.Point selectionBoxRelativePoint = rectangle_SelectionBox.TranslatePoint(new System.Windows.Point(0, 0), canvas_SelectionBox);
                 Rect selectionBoxArea = new Rect(selectionBoxRelativePoint.X, selectionBoxRelativePoint.Y, rectangle_SelectionBox.Width, rectangle_SelectionBox.Height);
 
@@ -1701,8 +1668,41 @@ namespace pxdArchiverCE
                 }
             }
             #endregion
+        }
 
 
+        /// <summary>
+        /// Global mouse left button up event for the window. Will reset and hide the selection box.
+        /// </summary>
+        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // Release the mouse capture
+            isMouseLeftButtonDownSelection = false;
+            this.ReleaseMouseCapture();
+
+            // Reset the selection box and hide it
+            Canvas.SetLeft(rectangle_SelectionBox, 0);
+            Canvas.SetTop(rectangle_SelectionBox, 0);
+            rectangle_SelectionBox.Width = 0;
+            rectangle_SelectionBox.Height = 0;
+            rectangle_SelectionBox.Visibility = Visibility.Collapsed;
+
+            // Reset the scroll tracker
+            lastScrollDirection = ScrollDirection.NONE;
+
+            // Unregister the global mouse events
+            Mouse.RemoveMouseMoveHandler(this, Window_MouseMove);
+            Mouse.RemoveMouseUpHandler(this, Window_MouseLeftButtonUp);
+
+            isClickingCell = false;
+        }
+
+
+        /// <summary>
+        /// Mouse move event for the DataGrid. Will check if the selected cells are being dragged and begin a drag event.
+        /// </summary>
+        private void datagrid_ParContents_MouseMove(object sender, MouseEventArgs e)
+        {
             #region DragDropMouseMove
             // Mouse left click is being held down.
             if (isCheckDragCell)
