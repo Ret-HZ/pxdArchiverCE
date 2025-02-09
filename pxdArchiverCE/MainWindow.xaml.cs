@@ -745,9 +745,24 @@ namespace pxdArchiverCE
         /// </summary>
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // Delete any selected elements.
             if (e.Key == Key.Delete)
             {
                 DeleteSelected();
+            }
+
+            // Select all elements. This is to prevent the DataGrid's selection from triggering, which also selects all the unselectable columns.
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.A)
+            {
+                datagrid_ParContents.Focus();
+                datagrid_ParContents.SelectedCells.Clear();
+                for (int i = 0; i < datagrid_ParContents.Items.Count; i++)
+                {
+                    DataGridCellInfo cellInfo = new DataGridCellInfo(datagrid_ParContents.Items[i], datagrid_ParContents.Columns[1]); // Get the Name cell (second column)
+                    datagrid_ParContents.SelectedCells.Add(cellInfo);
+                }
+
+                e.Handled = true;
             }
         }
 
