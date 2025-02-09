@@ -67,14 +67,35 @@ namespace pxdArchiverCE
         /// </summary>
         readonly System.Windows.Media.SolidColorBrush COLOR_BRUSH_DRAG_HOVER = new System.Windows.Media.SolidColorBrush(COLOR_DRAG_HOVER);
 
+        /// <summary>
+        /// Indicates if there are unsaved changes in the current PARC file.
+        /// </summary>
+        bool UnsavedChanges = false;
+
 
 
         public MainWindow()
         {
             Settings.Init();
             InitializeComponent();
-            this.Title = Util.GetAssemblyProductName();
+            UpdateWindowTitle();
             mi_Settings_Advanced_Session.Header = $"Session: {Settings.SESSION_GUID}";
+        }
+
+
+        /// <summary>
+        /// Updates the main window title with the name of the app and currently opened file, if applicable.
+        /// </summary>
+        private void UpdateWindowTitle()
+        {
+            if (PXDArchive == null)
+            {
+                this.Title = $"{Util.GetAssemblyProductName()}";
+            }
+            else
+            {
+                this.Title = $"{(UnsavedChanges ? "*" : "")}{Path.GetFileName(PXDArchivePath)} ｜ {Util.GetAssemblyProductName()}";
+            }
         }
 
 
@@ -90,6 +111,7 @@ namespace pxdArchiverCE
                 {
                     PXDArchive.Dispose();
                     PXDArchive = null;
+                    UnsavedChanges = false;
                 }
 
                 // Check the file magic and provide error messages in case it is another format or possibly encrypted
@@ -135,7 +157,7 @@ namespace pxdArchiverCE
 
                 OpenDirectory(PXDArchive);
                 PopulateTreeView(PXDArchive, true);
-                this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
+                UpdateWindowTitle();
             }
             catch (Exception ex)
             {
@@ -151,7 +173,7 @@ namespace pxdArchiverCE
                 NavigationHistoryPrevious.Clear();
                 NavigationHistoryNext.Clear();
                 NavigationHistoryCurrent = null;
-                this.Title = $"{Util.GetAssemblyProductName()}";
+                UpdateWindowTitle();
             }
         }
 
@@ -195,6 +217,8 @@ namespace pxdArchiverCE
                 File.Delete(path);
                 temp.TransformWith(new ParArchiveWriter(writerParameters));
                 temp.Dispose();
+                UnsavedChanges = false;
+                UpdateWindowTitle();
             }
             catch (Exception ex)
             {
@@ -638,6 +662,8 @@ namespace pxdArchiverCE
                         NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                         RefreshCurrentDirectory();
                         RefreshDirectoryTree();
+                        UnsavedChanges = true;
+                        UpdateWindowTitle();
                         return;
                     }
                 }
@@ -667,6 +693,8 @@ namespace pxdArchiverCE
                 NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                 RefreshCurrentDirectory();
                 RefreshDirectoryTree();
+                UnsavedChanges = true;
+                UpdateWindowTitle();
                 return;
             }
         }
@@ -692,6 +720,8 @@ namespace pxdArchiverCE
                     NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
                     RefreshCurrentDirectory();
                     RefreshDirectoryTree();
+                    UnsavedChanges = true;
+                    UpdateWindowTitle();
                 }
             }
         }
@@ -737,6 +767,8 @@ namespace pxdArchiverCE
 
             this.IsEnabled = true; // Re-enable the window
             RefreshCurrentDirectory();
+            UnsavedChanges = true;
+            UpdateWindowTitle();
         }
 
 
@@ -789,6 +821,7 @@ namespace pxdArchiverCE
                 if (PXDArchive != null)
                 {
                     PXDArchive.Dispose();
+                    UnsavedChanges = false;
                 }
 
                 string newParName = "new.par";
@@ -804,7 +837,7 @@ namespace pxdArchiverCE
 
                 OpenDirectory(PXDArchive);
                 PopulateTreeView(PXDArchive, true);
-                this.Title = $"{Util.GetAssemblyProductName()} [{Path.GetFileName(PXDArchivePath)}]";
+                UpdateWindowTitle();
             }
         }
 
@@ -1078,6 +1111,8 @@ namespace pxdArchiverCE
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UnsavedChanges = true;
+            UpdateWindowTitle();
         }
 
 
@@ -1099,6 +1134,8 @@ namespace pxdArchiverCE
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UnsavedChanges = true;
+            UpdateWindowTitle();
         }
 
 
@@ -1121,6 +1158,7 @@ namespace pxdArchiverCE
                 if (isBulk)
                 {
                     TouchUtils.SetTime(parEntry.Node, bulkDate);
+                    UnsavedChanges = true;
                     continue;
                 }
                 TouchSetTimeDialog touchSetTimeDialog = new TouchSetTimeDialog(parEntry.Name, parEntry.Time);
@@ -1130,10 +1168,12 @@ namespace pxdArchiverCE
                     TouchUtils.SetTime(parEntry.Node, touchSetTimeDialog.NewDate);
                     isBulk = touchSetTimeDialog.IsBulk;
                     bulkDate = touchSetTimeDialog.NewDate;
+                    UnsavedChanges = true;
                 }
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UpdateWindowTitle();
         }
 
 
@@ -1400,6 +1440,8 @@ namespace pxdArchiverCE
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UnsavedChanges = true;
+            UpdateWindowTitle();
         }
 
 
@@ -1416,6 +1458,8 @@ namespace pxdArchiverCE
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UnsavedChanges = true;
+            UpdateWindowTitle();
         }
 
 
@@ -1433,6 +1477,7 @@ namespace pxdArchiverCE
                 if (isBulk)
                 {
                     TouchUtils.SetTime(parEntry.Node, bulkDate);
+                    UnsavedChanges = true;
                     continue;
                 }
                 TouchSetTimeDialog touchSetTimeDialog = new TouchSetTimeDialog(parEntry.Name, parEntry.Time);
@@ -1442,10 +1487,12 @@ namespace pxdArchiverCE
                     TouchUtils.SetTime(parEntry.Node, touchSetTimeDialog.NewDate);
                     isBulk = touchSetTimeDialog.IsBulk;
                     bulkDate = touchSetTimeDialog.NewDate;
+                    UnsavedChanges = true;
                 }
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
+            UpdateWindowTitle();
         }
 
 
@@ -1483,12 +1530,15 @@ namespace pxdArchiverCE
                         }
                     }
                     parEntry.Node.Name = chosenName;
+
+                    UnsavedChanges = true;
                 }
             }
             NodeUtils.SortNodes(PXDArchive, Settings.AlternativeFileSorting);
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
             RefreshDirectoryTree();
+            UpdateWindowTitle();
         }
 
 
