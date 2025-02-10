@@ -233,20 +233,15 @@ namespace pxdArchiverCE
                     parameters.Version = 0x02;
                 }
 
-                try
+                // Attempt compression on a copy first.
+                Node copy = NodeUtils.CloneFile(node);
+                copy.TransformWith(new ParLibrary.Sllz.Compressor(parameters));
+                // A compressor error will result in the node's stream being disposed.
+                if (!copy.Stream.Disposed)
                 {
                     node.TransformWith(new ParLibrary.Sllz.Compressor(parameters));
                 }
-                catch (Exception ex)
-                {
-                    // Leave uncompressed
-                    parFile = node.GetFormatAs<ParFile>();
-                    if (parFile.IsCompressed)
-                    {
-                        node.TransformWith<ParLibrary.Sllz.Decompressor>();
-                        return;
-                    }
-                }
+                copy.Dispose();
 
                 // Leave uncompressed if the compressed result ends up being larger
                 parFile = node.GetFormatAs<ParFile>();
