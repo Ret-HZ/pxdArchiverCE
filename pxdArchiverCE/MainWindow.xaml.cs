@@ -1170,6 +1170,11 @@ namespace pxdArchiverCE
                     bulkDate = touchSetTimeDialog.NewDate;
                     UnsavedChanges = true;
                 }
+                // "Abort" pressed
+                else
+                {
+                    break;
+                }
             }
             // Refresh directory to reflect changes
             RefreshCurrentDirectory();
@@ -1488,6 +1493,11 @@ namespace pxdArchiverCE
                     isBulk = touchSetTimeDialog.IsBulk;
                     bulkDate = touchSetTimeDialog.NewDate;
                     UnsavedChanges = true;
+                }
+                // "Abort" pressed
+                else
+                {
+                    break;
                 }
             }
             // Refresh directory to reflect changes
