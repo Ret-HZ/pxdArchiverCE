@@ -235,7 +235,15 @@ namespace pxdArchiverCE
 
                 // Attempt compression on a copy first.
                 Node copy = NodeUtils.CloneFile(node);
-                copy.TransformWith(new ParLibrary.Sllz.Compressor(parameters));
+                try
+                {
+                    copy.TransformWith(new ParLibrary.Sllz.Compressor(parameters));
+                }
+                catch (Exception ex)
+                {
+                    copy.Dispose();
+                    return;
+                }
                 // A compressor error will result in the node's stream being disposed.
                 if (!copy.Stream.Disposed)
                 {
