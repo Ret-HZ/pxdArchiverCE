@@ -1620,10 +1620,6 @@ namespace pxdArchiverCE
 
             // Clear the selected cells
             datagrid_ParContents.SelectedCells.Clear();
-
-            // Register the mouse move event for the entire window
-            Mouse.AddMouseMoveHandler(this, Window_MouseMove);
-            Mouse.AddMouseUpHandler(this, Window_MouseLeftButtonUp);
         }
 
 
@@ -1754,10 +1750,6 @@ namespace pxdArchiverCE
 
             // Reset the scroll tracker
             lastScrollDirection = ScrollDirection.NONE;
-
-            // Unregister the global mouse events
-            Mouse.RemoveMouseMoveHandler(this, Window_MouseMove);
-            Mouse.RemoveMouseUpHandler(this, Window_MouseLeftButtonUp);
 
             isClickingCell = false;
         }
