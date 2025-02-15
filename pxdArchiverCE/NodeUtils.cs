@@ -21,7 +21,12 @@ namespace pxdArchiverCE
                 Node newNode = NodeFactory.FromArray(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
                 newNode.TransformWith(new ParFile());
                 ParFile parFile = newNode.GetFormatAs<ParFile>();
-                parFile.FileDate = File.GetLastWriteTime(filePath);
+                DateTime fileDate = File.GetLastWriteTime(filePath);
+                if (fileDate < TouchUtils.RESET_TIME || fileDate > TouchUtils.MAX_TIME)
+                {
+                    fileDate = TouchUtils.RESET_TIME;
+                }
+                parFile.FileDate = fileDate;
                 parFile.Attributes = (int)File.GetAttributes(filePath);
                 parentNode.Add(newNode);
                 return true;

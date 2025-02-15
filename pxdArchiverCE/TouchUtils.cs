@@ -5,7 +5,8 @@ namespace pxdArchiverCE
 {
     internal static class TouchUtils
     {
-        private static readonly DateTime RESET_TIME = new DateTime(1970, 1, 1);
+        internal static readonly DateTime RESET_TIME = new DateTime(1970, 1, 1);
+        internal static readonly DateTime MAX_TIME = new DateTime(3000, 1, 1);
 
 
         /// <summary>
@@ -15,6 +16,11 @@ namespace pxdArchiverCE
         /// <param name="time">The time to set.</param>
         internal static void SetTime(Node node, DateTime time)
         {
+            if (time < RESET_TIME || time > MAX_TIME)
+            {
+                time = RESET_TIME;
+            }
+
             if (node.IsContainer)
             {
                 foreach (Node child in node.Children)
