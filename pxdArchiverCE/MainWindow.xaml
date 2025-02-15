@@ -28,10 +28,10 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="New" Click="FileNew_Click"/>
-                <MenuItem Header="Open" Click="FileOpen_Click"/>
-                <MenuItem Header="Save" Click="FileSave_Click"/>
-                <MenuItem Header="Save as..." Click="FileSaveAs_Click"/>
+                <MenuItem x:Name="mi_File_New" Header="New" InputGestureText="Ctrl+N" Click="FileNew_Click"/>
+                <MenuItem x:Name="mi_File_Open" Header="Open" InputGestureText="Ctrl+O" Click="FileOpen_Click"/>
+                <MenuItem x:Name="mi_File_Save" Header="Save" InputGestureText="Ctrl+S" Click="FileSave_Click"/>
+                <MenuItem x:Name="mi_File_SaveAs" InputGestureText="Ctrl+Shift+S" Header="Save as..." Click="FileSaveAs_Click"/>
             </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem x:Name="mi_Edit_Touch" Header="touch">
@@ -93,14 +93,13 @@
 
             <ToolBarTray Grid.Column="0" HorizontalAlignment="Stretch" IsLocked="True">
                 <ToolBar ToolTip="General" Loaded="ToolBar_Loaded">
-                    <Button ToolTip="New" Click="FileNew_Click" >
+                    <Button x:Name="btn_General_File_New" ToolTip="New" Click="FileNew_Click" >
                         <Image Source="/Resources/Images/File.png" Width="16" Height="16"/>
                     </Button>
-                    <Button ToolTip="Open" Click="FileOpen_Click">
+                    <Button x:Name="btn_General_File_Open" ToolTip="Open" Click="FileOpen_Click">
                         <Image Source="/Resources/Images/Folder.png" Width="16" Height="16"/>
                     </Button>
-
-                    <Button ToolTip="Save" Click="FileSave_Click">
+                    <Button x:Name="btn_General_File_Save" ToolTip="Save" Click="FileSave_Click">
                         <Image Source="/Resources/Images/Save.png" Width="16" Height="16"/>
                     </Button>
                 </ToolBar>

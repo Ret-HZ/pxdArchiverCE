@@ -849,7 +849,34 @@ namespace pxdArchiverCE
                     DataGridCellInfo cellInfo = new DataGridCellInfo(datagrid_ParContents.Items[i], datagrid_ParContents.Columns[1]); // Get the Name cell (second column)
                     datagrid_ParContents.SelectedCells.Add(cellInfo);
                 }
+                e.Handled = true;
+            }
 
+            // Trigger the "File > New" button.
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.N)
+            {
+                btn_General_File_New.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                e.Handled = true;
+            }
+
+            // Trigger the "File > Open" button.
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.O)
+            {
+                btn_General_File_Open.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                e.Handled = true;
+            }
+
+            // Trigger the "File > Save" button.
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.S)
+            {
+                btn_General_File_Save.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                e.Handled = true;
+            }
+
+            // Trigger the "File > Save As" MenuItem.
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) && e.Key == Key.S)
+            {
+                mi_File_SaveAs.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
                 e.Handled = true;
             }
         }
