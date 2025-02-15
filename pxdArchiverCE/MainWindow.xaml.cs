@@ -701,6 +701,59 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Extracts the selected files to the destination chosen by the user.
+        /// </summary>
+        private void ExtractSelected()
+        {
+            if (PXDArchive == null) return;
+            List<ParEntry> parEntries = GetSelectedParEntries();
+            if (parEntries.Count == 0) return;
+
+            // Single file extraction
+            if (parEntries.Count == 1 && !parEntries.Last().Node.IsContainer)
+            {
+                Node node = parEntries.Last().Node;
+                string nodeExtension = Path.GetExtension(node.Name);
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Filter = $"{nodeExtension.ToUpper().Substring(1)} File (*{nodeExtension})|*{nodeExtension}|" + "All types (*.*)|*.*",
+                    FileName = node.Name,
+
+                };
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    ExtractFile(node, saveFileDialog.FileName);
+                }
+                else return;
+            }
+            // Multiple fileDescriptors or directories
+            else
+            {
+                var openFolderDialog = new OpenFolderDialog
+                {
+                    Title = "Choose where to extract the content",
+                };
+
+                if (openFolderDialog.ShowDialog() == true)
+                {
+                    foreach (ParEntry parEntry in parEntries)
+                    {
+                        if (parEntry.Node.IsContainer)
+                        {
+                            ExtractDirectory(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                        }
+                        else
+                        {
+                            ExtractFile(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Prompts the user for confirmation and, if allowed, will delete the selected elements.
         /// </summary>
         private void DeleteSelected()
@@ -1361,50 +1414,7 @@ namespace pxdArchiverCE
         /// </summary>
         private void datagrid_ParContents_ContextMenu_mi_Extract_Click(object sender, RoutedEventArgs e)
         {
-            List<ParEntry> parEntries = GetSelectedParEntries();
-            if (parEntries.Count == 0) return;
-
-            // Single file extraction
-            if (parEntries.Count == 1 && !parEntries.Last().Node.IsContainer)
-            {
-                Node node = parEntries.Last().Node;
-                string nodeExtension = Path.GetExtension(node.Name);
-
-                SaveFileDialog saveFileDialog = new SaveFileDialog()
-                {
-                    Filter = $"{nodeExtension.ToUpper().Substring(1)} File (*{nodeExtension})|*{nodeExtension}|" + "All types (*.*)|*.*",
-                    FileName = node.Name,
-
-                };
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    ExtractFile(node, saveFileDialog.FileName);
-                }
-                else return;
-            }
-            // Multiple fileDescriptors or directories
-            else
-            {
-                var openFolderDialog = new OpenFolderDialog
-                {
-                    Title = "Choose where to extract the content",
-                };
-
-                if (openFolderDialog.ShowDialog() == true)
-                {
-                    foreach (ParEntry parEntry in parEntries)
-                    {
-                        if (parEntry.Node.IsContainer)
-                        {
-                            ExtractDirectory(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
-                        }
-                        else
-                        {
-                            ExtractFile(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
-                        }
-                    }
-                }
-            }
+            ExtractSelected();
         }
 
 
