@@ -22,38 +22,6 @@ namespace pxdArchiverCE
 
 
         /// <summary>
-        /// Gets the directory a node is in. Will ignore dot "." directories.
-        /// </summary>
-        /// <param name="node">The node to get the directory of.</param>
-        /// <returns>The directory the node is in.</returns>
-        public static string GetNodeDirectory(Node node)
-        {
-            string directory = string.Empty;
-            bool isRootDirectory = false;
-            Node currentNode = node;
-            while (!isRootDirectory)
-            {
-                if (currentNode.Parent == null)
-                {
-                    isRootDirectory = true;
-                    break;
-                }
-
-                if (currentNode.Name == ".")
-                {
-                    currentNode = currentNode.Parent;
-                    continue;
-                }
-
-                directory = Path.Combine(currentNode.Name, directory);
-                currentNode = currentNode.Parent;
-            }
-
-            return directory;
-        }
-
-
-        /// <summary>
         /// Check if a file is currently in use by another process.
         /// </summary>
         /// <param name="file">The file.</param>

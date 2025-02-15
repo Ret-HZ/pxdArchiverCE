@@ -159,6 +159,44 @@ namespace pxdArchiverCE
 
 
         /// <summary>
+        /// Gets the directory a node is in. Will ignore dot "." directories.
+        /// </summary>
+        /// <param name="node">The node to get the directory of.</param>
+        /// <returns>The directory the node is in.</returns>
+        public static string GetNodeDirectory(Node node)
+        {
+            string directory = string.Empty;
+            bool isRootDirectory = false;
+            Node currentNode = node;
+
+            if (currentNode.Parent == null)
+                return directory;
+
+            currentNode = currentNode.Parent;
+
+            while (!isRootDirectory)
+            {
+                if (currentNode.Parent == null)
+                {
+                    isRootDirectory = true;
+                    break;
+                }
+
+                if (currentNode.Name == ".")
+                {
+                    currentNode = currentNode.Parent;
+                    continue;
+                }
+
+                directory = Path.Combine(currentNode.Name, directory);
+                currentNode = currentNode.Parent;
+            }
+
+            return directory;
+        }
+
+
+        /// <summary>
         /// Count the amount of files inside a  <see cref="Node"/>.
         /// </summary>
         /// <param name="nodes">The nodes to count.</param>
@@ -201,7 +239,7 @@ namespace pxdArchiverCE
                 Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     progressManager.UpdateProgress();
-                    progressManager.SetDescriptionText($"{Path.Combine(Util.GetNodeDirectory(node), node.Name)}");
+                    progressManager.SetDescriptionText($"{Path.Combine(GetNodeDirectory(node), node.Name)}");
                 });
 
                 if (progressManager.CheckIsCancelledByUser())

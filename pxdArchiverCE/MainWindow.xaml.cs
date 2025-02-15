@@ -425,7 +425,7 @@ namespace pxdArchiverCE
                         CompressedSize = compressedSize,
                         Ratio = ratio,
                         Time = time,
-                        Directory = Util.GetNodeDirectory(node),
+                        Directory = NodeUtils.GetNodeDirectory(node),
                         Node = node,
                         TotalSize = totalSize,
                     });
