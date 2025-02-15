@@ -777,6 +777,9 @@ namespace pxdArchiverCE
         /// </summary>
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // Ignore shortcuts if the search bar has keyboard focus.
+            if (tb_Navigation_Input.IsKeyboardFocusWithin) return;
+
             // Delete any selected elements.
             if (e.Key == Key.Delete)
             {
