@@ -162,7 +162,12 @@
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="grid_ParDirectory" Grid.Column="0" AllowDrop="True" Drop="grid_ParDirectory_Drop">
-                <TreeView x:Name="treeview_ParFolders" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <TreeView x:Name="treeview_ParFolders" Grid.Row="0" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                     <TreeView.Resources>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
@@ -184,6 +189,11 @@
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </TreeView>
+
+                <Grid Grid.Row="1">
+                    <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="#FFF0F0F0"/>
+                    <TextBlock x:Name="tb_DirectoryInfo" VerticalAlignment="Center" Margin="10,5,10,5" Text="Directory Name ｜ X elements ｜ X selected (0 B)"/>
+                </Grid>
             </Grid>
 
             <GridSplitter Grid.Column="0" Width="5"/>

@@ -79,6 +79,7 @@ namespace pxdArchiverCE
             Settings.Init();
             InitializeComponent();
             UpdateWindowTitle();
+            UpdateDirectoryInfo();
             mi_Settings_Advanced_Session.Header = $"Session: {Settings.SESSION_GUID}";
         }
 
@@ -255,6 +256,7 @@ namespace pxdArchiverCE
             NavigationHistoryCurrent = node;
             PopulateDataGrid(node);
             UpdateNavigationToolbar();
+            UpdateDirectoryInfo();
         }
 
 
@@ -352,6 +354,7 @@ namespace pxdArchiverCE
             if (NavigationHistoryCurrent == null) return;
             PopulateDataGrid(NavigationHistoryCurrent);
             UpdateNavigationToolbar();
+            UpdateDirectoryInfo();
         }
 
 
@@ -603,6 +606,33 @@ namespace pxdArchiverCE
             btn_Navigation_DirectoryUp.IsEnabled = (NavigationHistoryCurrent != null && NavigationHistoryCurrent.Parent != null && NavigationHistoryCurrent.Name != ".") ? true : false;
             btn_Navigation_Previous.IsEnabled = (NavigationHistoryPrevious.Count > 0) ? true : false;
             btn_Navigation_Next.IsEnabled = (NavigationHistoryNext.Count > 0) ? true : false;
+        }
+
+
+        /// <summary>
+        /// Update the directory info bar.
+        /// </summary>
+        private void UpdateDirectoryInfo()
+        {
+            string text = "";
+            if (PXDArchive == null)
+            {
+                text = "No PARC open";
+            }
+            else
+            {
+                string name = (NavigationHistoryCurrent.Name == ".") ? $"{NavigationHistoryCurrent.Parent.Name}" : $"{NavigationHistoryCurrent.Name}";
+                List<ParEntry> selectedElements = GetSelectedParEntries();
+                long totalSize = 0;
+                foreach (ParEntry entry in selectedElements)
+                {
+                    totalSize += entry.TotalSize;
+                }
+                string selectedText = (selectedElements.Count == 0) ? "" : $"｜ {selectedElements.Count} selected ({((Settings.SizeDisplayUnit == SizeDisplayUnit.AUTO) ? Util.FormatBytes(totalSize) : $"{totalSize} B")})";
+
+                text = $"{name} ｜ {NavigationHistoryCurrent.Children.Count} elements {selectedText}";
+            }
+            tb_DirectoryInfo.Text = text;
         }
 
 
@@ -1802,6 +1832,8 @@ namespace pxdArchiverCE
             lastScrollDirection = ScrollDirection.NONE;
 
             isClickingCell = false;
+
+            UpdateDirectoryInfo();
         }
 
 
