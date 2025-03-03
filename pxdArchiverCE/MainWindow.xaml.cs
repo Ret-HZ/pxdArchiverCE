@@ -268,7 +268,7 @@ namespace pxdArchiverCE
         private void OpenFile(Node node, string directory)
         {
             string outPath = Path.Combine(Settings.PATH_APPDATA_SESSION_CONTENTS, directory, node.Name);
-            if (ExtractFile(node, outPath))
+            if (ExtractFile(node, outPath, false))
             {
                 Util.OpenFileWithDefaultProgram(outPath);
             }
@@ -281,9 +281,24 @@ namespace pxdArchiverCE
         /// <param name="node">The node to write.</param>
         /// <param name="outputPath">The path to write to.</param>
         /// <returns>A <see cref="bool"/> indicating if the operation was successful.</returns>
-        private bool ExtractFile(Node node, string outputPath)
+        private bool ExtractFile(Node node, string outputPath, bool reportToProgressManager = true)
         {
             if (node.IsContainer) return false;
+
+            if (reportToProgressManager)
+            {
+                // Update the progress window UI
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    ProgressManager.UpdateProgress();
+                    ProgressManager.SetDescriptionText($"{Path.Combine(NodeUtils.GetNodeDirectory(node), node.Name)}");
+                });
+
+                if (ProgressManager.CheckIsCancelledByUser())
+                {
+                    return false;
+                }
+            }
 
             if (File.Exists(outputPath))
             {
@@ -753,11 +768,11 @@ namespace pxdArchiverCE
                 };
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    ExtractFile(node, saveFileDialog.FileName);
+                    ExtractFile(node, saveFileDialog.FileName, false);
                 }
                 else return;
             }
-            // Multiple fileDescriptors or directories
+            // Multiple files or directories
             else
             {
                 var openFolderDialog = new OpenFolderDialog
@@ -767,17 +782,46 @@ namespace pxdArchiverCE
 
                 if (openFolderDialog.ShowDialog() == true)
                 {
+                    List<Node> nodeList = new List<Node>();
+                    long totalSelectionSize = 0;
                     foreach (ParEntry parEntry in parEntries)
                     {
-                        if (parEntry.Node.IsContainer)
-                        {
-                            ExtractDirectory(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
-                        }
-                        else
-                        {
-                            ExtractFile(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
-                        }
+                        nodeList.Add(parEntry.Node);
+                        totalSelectionSize += parEntry.TotalSize;
                     }
+                    int totalFiles = NodeUtils.CountFiles(nodeList);
+                    ProgressManager = new ProgressManager(totalFiles);
+                    ProgressManager.PrepareWindowText($"Extracting {totalFiles} files", $"Extracting {totalFiles} files ({Util.FormatBytes(totalSelectionSize)})");
+                    ProgressManager.ShowProgressDialogNonBlocking();
+                    this.IsEnabled = false; // Disable the window while the extraction runs
+
+                    var frame = new DispatcherFrame();
+                    List<Task> tasks = new List<Task>();
+
+                    foreach (ParEntry parEntry in parEntries)
+                    {
+                        tasks.Add(Task.Run(() =>
+                        {
+                            if (parEntry.Node.IsContainer)
+                            {
+                                ExtractDirectory(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                            }
+                            else
+                            {
+                                ExtractFile(parEntry.Node, Path.Combine(openFolderDialog.FolderName, parEntry.Node.Name));
+                            }
+                        }));
+                    }
+
+                    // Continue only after the extraction task finishes
+                    Task.WhenAll(tasks).ContinueWith(_ =>
+                    {
+                        frame.Continue = false;
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                    Dispatcher.PushFrame(frame);
+
+                    this.IsEnabled = true; // Re-enable the window
                 }
             }
         }
