@@ -923,6 +923,7 @@ namespace pxdArchiverCE
                     DataGridCellInfo cellInfo = new DataGridCellInfo(datagrid_ParContents.Items[i], datagrid_ParContents.Columns[1]); // Get the Name cell (second column)
                     datagrid_ParContents.SelectedCells.Add(cellInfo);
                 }
+                UpdateDirectoryInfo();
                 e.Handled = true;
             }
 
