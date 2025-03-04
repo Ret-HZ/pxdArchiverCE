@@ -2040,7 +2040,7 @@ namespace pxdArchiverCE
                 {
                     selectedCellHistory = new List<DataGridCellInfo>(datagrid_ParContents.SelectedCells);
                 }
-                else
+                else if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 {
                     selectedCellHistory.Clear();
                     datagrid_ParContents.SelectedCells.Clear();
