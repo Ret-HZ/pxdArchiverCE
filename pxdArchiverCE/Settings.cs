@@ -17,12 +17,14 @@ namespace pxdArchiverCE
 
 
         // SETTINGS
-        internal static int IniVersion = 2;
+        internal static int IniVersion = 3;
         internal static bool CopyParToTempLocation = false;
         internal static bool LegacyMode = false;
         internal static bool AlternativeFileSorting = false;
         internal static bool HandleNestedPar = false;
         internal static SizeDisplayUnit SizeDisplayUnit = SizeDisplayUnit.AUTO;
+        internal static int WindowHeight = 800;
+        internal static int WindowWidth = 1400;
 
 
         /// <summary>
@@ -55,6 +57,12 @@ namespace pxdArchiverCE
             if (fileIniVersion >= 2)
             {
                 AlternativeFileSorting = bool.Parse(settings["PARC"]["AlternativeFileSorting"]);
+            }
+            // Read options added on version 3
+            if (fileIniVersion >= 3)
+            {
+                WindowHeight = int.Parse(settings["GUI"]["WindowHeight"]);
+                WindowWidth = int.Parse(settings["GUI"]["WindowWidth"]);
             }
 
             // Update to latest template
@@ -89,6 +97,8 @@ namespace pxdArchiverCE
                 settings["PARC"]["AlternativeFileSorting"] = AlternativeFileSorting.ToString().ToLower();
                 settings["PARC"]["HandleNestedPar"] = HandleNestedPar.ToString().ToLower();
                 settings["GUI"]["SizeDisplayUnit"] = Convert.ToInt32(SizeDisplayUnit).ToString();
+                settings["GUI"]["WindowHeight"] = Convert.ToInt32(WindowHeight).ToString();
+                settings["GUI"]["WindowWidth"] = Convert.ToInt32(WindowWidth).ToString();
                 iniParser.WriteFile(PATH_APPDATA_SETTINGS, settings);
             }
             catch (Exception ex)

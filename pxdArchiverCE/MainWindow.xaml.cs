@@ -78,6 +78,8 @@ namespace pxdArchiverCE
         {
             Settings.Init();
             InitializeComponent();
+            this.Height = Settings.WindowHeight;
+            this.Width = Settings.WindowWidth;
             UpdateWindowTitle();
             UpdateDirectoryInfo();
             mi_Settings_Advanced_Session.Header = $"Session: {Settings.SESSION_GUID}";
@@ -963,6 +965,9 @@ namespace pxdArchiverCE
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (PXDArchive != null) PXDArchive.Dispose();
+            Settings.WindowWidth = (int)this.ActualWidth;
+            Settings.WindowHeight = (int)this.ActualHeight;
+            Settings.SaveSettings();
             Settings.Cleanup();
         }
 
