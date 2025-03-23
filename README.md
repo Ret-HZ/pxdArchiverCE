@@ -12,7 +12,7 @@ It provides an easy way for modders to create, open and edit the __PARC__ (.par)
 
 # Screenshots
 
-| ![pxdArchiverCE_Screenshot1](https://github.com/user-attachments/assets/158fa508-0168-4957-a45e-2a4d6facae4b) | ![pxdArchiver_Screenshot2](https://github.com/user-attachments/assets/aa75b8ca-fd86-465e-8351-3b27570c52c9) |
+| ![pxdArchiverCE_Screenshot1](https://github.com/user-attachments/assets/d691df07-ea43-4bd4-8deb-cb368f373566) | ![pxdArchiverCE_Screenshot2](https://github.com/user-attachments/assets/956acd2f-4ced-484e-b0ee-f2f95f5ccd70) |
 |---|---|
 
 <br>
