@@ -91,7 +91,11 @@ namespace pxdArchiverCE
 
         public void CloseProgressDialog()
         {
-            ProgressDialog.Close();
+            if (ProgressDialog != null && ProgressDialog.IsVisible)
+            {
+                ProgressDialog.AllowClosing = true;
+                ProgressDialog.Close();
+            }
         }
 
 
